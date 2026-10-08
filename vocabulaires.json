@@ -1,0 +1,53 @@
+{
+  "type": {
+    "prompt": "Prompt",
+    "skill": "Skill",
+    "projet": "Projet",
+    "script": "Script"
+  },
+  "usage": {
+    "redaction": "Rédaction",
+    "synthese": "Synthèse",
+    "recherche-veille": "Recherche et veille",
+    "analyse-documents-donnees": "Analyse de documents et de données",
+    "preparation-pedagogie": "Préparation et pédagogie",
+    "automatisation-administrative": "Automatisation administrative",
+    "code-scripts": "Code et scripts"
+  },
+  "ia": {
+    "claude": "Claude",
+    "chatgpt": "ChatGPT",
+    "mistral": "Mistral",
+    "gemini": "Gemini",
+    "toutes": "Toutes les IA"
+  },
+  "langue": {
+    "fr": "Français",
+    "en": "Anglais"
+  },
+  "niveau": {
+    "debutant": "Débutant",
+    "intermediaire": "Intermédiaire",
+    "avance": "Avancé"
+  },
+  "statut": {
+    "propose": "Proposé",
+    "relu": "Relu",
+    "recommande": "Recommandé"
+  },
+  "donnees": {
+    "exemples-fictifs": "Exemples fictifs uniquement"
+  },
+  "controles": {
+    "aucune-donnee-reelle": "Aucune donnée réelle, aucune mention de protection.",
+    "exemples-fictifs": "Tous les exemples sont fictifs.",
+    "aucun-nom-adresse": "Aucun nom de personne, adresse ni identifiant.",
+    "aucun-appel-reseau": "Aucun script ne contacte un service extérieur."
+  },
+  "filiation": {
+    "original": "Original",
+    "adaptation": "Adaptation de",
+    "fusion": "Fusion de",
+    "version-simplifiee": "Version simplifiée de"
+  }
+}

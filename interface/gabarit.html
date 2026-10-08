@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{titre_page}}</title>
+<script>document.documentElement.classList.add('js');</script>
+<link rel="stylesheet" href="{{racine}}assets/style.css">
+</head>
+<body class="{{classe_corps}}">
+<a class="lien-evitement" href="#principal">Aller au contenu</a>
+{{bandeau}}
+<header class="entete">
+  <a class="marque" href="{{racine}}index.html"><span class="marque-nom">{{nom}}</span><span class="marque-sous">{{sous_nom}}</span></a>
+  <nav class="navigation" aria-label="Navigation principale">{{nav}}</nav>
+</header>
+<main id="principal">
+{{contenu}}
+</main>
+<footer class="pied">
+  <div class="pied-interieur"><span>{{pied}}</span><span class="mono majuscules">{{pied_droite}}</span></div>
+</footer>
+<noscript><p class="avis-js">Les filtres, les schémas et la visionneuse de fichiers demandent JavaScript, activé par défaut dans les navigateurs.</p></noscript>
+{{donnees}}
+{{scripts}}
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "nom": "Bibliothèque IA",
+  "sous_nom": "TERRE",
+  "accroche": "Les solutions IA de la communauté Terre, expliquées pas à pas.",
+  "introduction": "Prompts, skills, scripts et projets testés par des camarades. Chaque fiche dit ce que fait la solution, comment elle fonctionne, et comment l'installer avec Claude, ChatGPT, Mistral ou Gemini.",
+  "mention": "Version locale de test",
+  "pied": "Lecture ouverte à tous. Dépôt réservé aux contributeurs invités, avec relecture avant publication.",
+  "pied_droite": "Exemples fictifs uniquement · aucune donnée sensible"
+}
