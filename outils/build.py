@@ -334,6 +334,8 @@ class Constructeur:
         (SITE / "assets").mkdir()
         for nom in ("style.css", "catalogue.js", "projet.js", "proposer.js"):
             shutil.copy(str(INTERFACE / nom), str(SITE / "assets" / nom))
+        if (INTERFACE / "polices").is_dir():
+            shutil.copytree(str(INTERFACE / "polices"), str(SITE / "assets" / "polices"))
         projets.sort(key=lambda p: (ORDRE_STATUT.get(p["meta"]["statut"], 9), p["meta"]["titre"].lower()))
         for p in projets:
             self.construire_projet(p, projets)
