@@ -50,6 +50,7 @@ class Constructeur:
         liens = [("Projets", racine + "index.html", "projets")]
         for _, slug, titre in self.pages_docs:
             liens.append((titre, racine + "pages/%s.html" % slug, slug))
+        liens.append(("Proposer un projet", racine + "pages/proposer.html", "proposer"))
         return "".join(
             '<a href="%s"%s>%s</a>' % (url, ' aria-current="page"' if cle == active else "", echapper(titre))
             for titre, url, cle in liens
@@ -305,19 +306,40 @@ class Constructeur:
             contenu = '<article class="doc doc-page">%s</article>' % corps
             self.page(SITE / "pages" / ("%s.html" % slug), "%s — %s" % (titre, self.site["nom"]), contenu, "../", slug, classe="page-doc")
 
+    def construire_proposer(self):
+        intro = (
+            "Vous avez un prompt, un skill, un script ou un projet qui sert ? Partagez-le en remplissant ce formulaire. "
+            "Pas de compte, pas d'installation : tout reste dans votre navigateur jusqu'à ce que vous téléchargiez le fichier. "
+            "Utilisez uniquement des exemples fictifs."
+        )
+        contenu = (
+            '<article class="doc doc-page page-formulaire"><h1>Proposer un projet</h1><p class="chapeau">%s</p>'
+            '<p class="avis-regle"><strong>Avant de commencer :</strong> aucune donnée réelle, aucun nom, aucune adresse, '
+            'aucune mention de protection. Les <a href="regles.html">règles de publication</a> expliquent pourquoi.</p>'
+            '<noscript><p class="avis-js">Ce formulaire demande JavaScript.</p></noscript>'
+            '<div id="formulaire"></div></article>'
+        ) % echapper(intro)
+        donnees = {
+            "vocab": {k: self.vocab[k] for k in ("type", "usage", "ia", "langue", "niveau", "controles")},
+            "contact": self.site.get("contact_propositions", "Envoyez ce fichier à la personne qui gère la bibliothèque."),
+        }
+        self.page(SITE / "pages" / "proposer.html", "Proposer un projet — %s" % self.site["nom"], contenu, "../", "proposer",
+                  donnees=donnees, scripts=("proposer.js",), classe="page-doc")
+
     def lancer(self):
         projets = self.lire_tous()
         if SITE.exists():
             shutil.rmtree(str(SITE))
         SITE.mkdir(parents=True)
         (SITE / "assets").mkdir()
-        for nom in ("style.css", "catalogue.js", "projet.js"):
+        for nom in ("style.css", "catalogue.js", "projet.js", "proposer.js"):
             shutil.copy(str(INTERFACE / nom), str(SITE / "assets" / nom))
         projets.sort(key=lambda p: (ORDRE_STATUT.get(p["meta"]["statut"], 9), p["meta"]["titre"].lower()))
         for p in projets:
             self.construire_projet(p, projets)
         self.construire_catalogue(projets)
         self.construire_docs()
+        self.construire_proposer()
         print("Site généré : %d projet(s), %d page(s) de documentation." % (len(projets), len(self.pages_docs)))
         print("Ouvrez site/index.html dans votre navigateur (double-clic).")
 

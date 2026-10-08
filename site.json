@@ -4,6 +4,7 @@
   "accroche": "Les solutions IA de la communauté Terre, expliquées pas à pas.",
   "introduction": "Prompts, skills, scripts et projets testés par des camarades. Chaque fiche dit ce que fait la solution, comment elle fonctionne, et comment l'installer avec Claude, ChatGPT, Mistral ou Gemini.",
   "mention": "Version locale de test",
-  "pied": "Lecture ouverte à tous. Dépôt réservé aux contributeurs invités, avec relecture avant publication.",
-  "pied_droite": "Exemples fictifs uniquement · aucune donnée sensible"
+  "pied": "Lecture ouverte à tous. Chaque proposition est relue avant publication.",
+  "pied_droite": "Exemples fictifs uniquement · aucune donnée sensible",
+  "contact_propositions": "Envoyez ce fichier à la personne qui gère la bibliothèque, par la messagerie que vous utilisez ensemble."
 }

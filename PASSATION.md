@@ -10,6 +10,7 @@ Un dépôt Git contenant tout : les projets (`projets/`), les modèles (`modele/
 
 1. Installez Python 3.8 ou plus récent. Aucune bibliothèque à installer.
 2. `python outils/valider.py` : tous les projets doivent être conformes.
+   Pour ajouter une proposition reçue : glissez le fichier `.json` sur `ajouter.bat` (Windows) ou lancez `python outils/importer.py fichier.json`.
 3. `python outils/build.py` : le site est généré dans `site/`.
 4. Ouvrez `site/index.html` dans un navigateur.
 
@@ -29,6 +30,8 @@ Un dépôt Git contenant tout : les projets (`projets/`), les modèles (`modele/
 | les règles | `REGLES.md` |
 | l'apparence | `interface/style.css` |
 | les contrôles automatiques | `outils/valider.py` |
+| le formulaire de proposition | `interface/proposer.js` |
+| l'import d'une proposition | `outils/importer.py` |
 
 Si vous changez un vocabulaire, relancez la vérification : les projets qui utilisent une ancienne valeur seront signalés.
 

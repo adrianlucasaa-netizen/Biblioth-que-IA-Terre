@@ -13,6 +13,7 @@ Le site est déjà généré. Ouvrez `site/index.html` dans un navigateur (doubl
 ```
 python outils/valider.py        # vérifie tous les projets
 python outils/build.py          # génère le site dans site/
+python outils/importer.py proposition-xxx.json   # ajoute une proposition reçue du formulaire
 python outils/nouveau.py mon-projet --type prompt
 python outils/nouveau.py ma-version --depuis synthese-conference
 ```
@@ -26,7 +27,8 @@ Sous Linux ou macOS, remplacez `python` par `python3` si besoin.
 | `projets/` | un dossier par projet, avec sa fiche `README.md` |
 | `modele/` | un modèle de départ par type |
 | `interface/` | gabarit, styles et scripts du site |
-| `outils/` | vérification, création, génération |
+| `outils/` | vérification, import, création, génération |
+| `ajouter.bat` | Windows : glisser une proposition `.json` dessus pour l'ajouter |
 | `vocabulaires.json` | catégories de classement |
 | `site.json` | textes du site |
 | `REGLES.md`, `DEBUTER.md`, `CONTRIBUER.md` | pages du site |
@@ -34,4 +36,4 @@ Sous Linux ou macOS, remplacez `python` par `python3` si besoin.
 
 ## Statut
 
-Version de test locale. Les sept projets sont des exemples fictifs. La licence et l'hébergement ne sont pas décidés.
+Les sept projets sont des exemples fictifs. La licence et l'hébergement ne sont pas décidés.

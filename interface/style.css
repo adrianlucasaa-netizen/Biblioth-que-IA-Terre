@@ -216,3 +216,50 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.015em; line-height: 1.15; text
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 .detail-etape + .meta-ligne { margin-top: 14px; }
+
+/* Formulaire « Proposer un projet » */
+.page-formulaire { max-width: 860px; }
+.page-formulaire .chapeau { font-size: 18px; }
+.avis-regle { padding: 12px 16px; border-radius: 6px; background: var(--alerte-fond); color: var(--alerte-texte); }
+.avis-regle a { color: inherit; }
+.formulaire { display: flex; flex-direction: column; gap: 28px; margin-top: 24px; }
+.bloc-form { margin: 0; padding: 22px 24px 24px; border: 1px solid var(--trait); border-radius: 6px; background: var(--surface); display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.bloc-form legend { padding: 0 8px; font-weight: 700; font-size: 18px; }
+.bloc-intro { margin: -6px 0 0; color: var(--encre-douce); max-width: 68ch; }
+.champ { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.champ-titre, .sous-titre { font-weight: 600; }
+.sous-champ { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600; min-width: 0; }
+.sous-champ .saisie { font-weight: 400; }
+.requis { font-weight: 400; color: var(--discret); font-size: 13px; }
+.champ-aide { margin: 0; font-size: 14px; color: var(--discret); max-width: 68ch; }
+.saisie { width: 100%; font: inherit; color: var(--encre); background: var(--fond); border: 1px solid var(--trait-fort); border-radius: 6px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; }
+textarea.saisie { resize: vertical; line-height: 1.5; }
+.saisie.mono { font-family: var(--police-mono); font-size: 13px; }
+.ligne-deux { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.choix-type { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.carte-choix { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px 12px 40px; border: 1px solid var(--trait-fort); border-radius: 6px; background: var(--fond); cursor: pointer; }
+.carte-choix input { position: absolute; left: 14px; top: 15px; margin: 0; }
+.carte-choix:has(input:checked) { border-color: var(--accent); background: var(--accent-doux); }
+.carte-choix:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+.carte-choix-nom { font-weight: 700; }
+.carte-choix-aide { font-size: 13px; color: var(--encre-douce); }
+.choix-ia, .attestations, .choix-qui { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.attestations { flex-direction: column; }
+.case { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; cursor: pointer; }
+.case input { width: 18px; height: 18px; margin: 0; }
+.etape-form { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--trait); border-radius: 6px; background: var(--fond); margin-bottom: 14px; }
+.etape-entete { display: flex; justify-content: space-between; align-items: center; }
+.erreurs-form { padding: 16px 20px; border: 2px solid #B3261E; border-radius: 6px; background: var(--surface); }
+.erreurs-form[hidden], .resultat-form[hidden] { display: none; }
+.erreurs-titre { margin: 0 0 6px; font-weight: 700; color: #B3261E; }
+.erreurs-form ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.erreurs-form a { color: var(--encre); }
+.actions-form { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.resultat-form { padding: 22px 24px; border: 2px solid var(--accent); border-radius: 6px; background: var(--accent-doux); display: flex; flex-direction: column; gap: 14px; }
+.resultat-form h2 { margin: 0; }
+.resultat-form ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.details-json summary { cursor: pointer; font-weight: 600; }
+@media (max-width: 700px) {
+  .ligne-deux { grid-template-columns: 1fr; }
+  .bloc-form { padding: 18px 14px 20px; }
+}
