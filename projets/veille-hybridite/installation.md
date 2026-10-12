@@ -1,6 +1,6 @@
 ## Étapes communes
 
-Ce projet est écrit pour Claude, et pour Claude seulement. Il demande un compte Claude qui donne accès aux projets et aux tâches planifiées (d'après l'aide officielle, les tâches planifiées sont proposées aux formules Pro, Max, Team et Enterprise). Comptez une dizaine de minutes.
+Ce projet est écrit pour Claude, et pour Claude seulement. Il demande un compte Claude qui donne accès aux projets et aux tâches planifiées (d'après l'aide officielle, les tâches planifiées sont proposées aux formules Pro, Max, Team et Enterprise).
 
 Dans la fiche de ce projet, l'onglet des fichiers affiche chaque fichier avec un bouton « Copier le contenu ». Il n'y a rien à télécharger ni à décompresser : vous copiez, vous collez.
 
