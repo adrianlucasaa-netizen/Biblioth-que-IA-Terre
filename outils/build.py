@@ -281,7 +281,7 @@ class Constructeur:
 <section class="heros">
   <h1>%s</h1>
   <p class="chapeau">%s</p>
-  <div class="champ-recherche">
+%s  <div class="champ-recherche">
     <label for="recherche" class="sr-only">Rechercher un projet</label>
     <input id="recherche" type="search" placeholder="Rechercher un usage, un type, une IA, une étiquette" autocomplete="off">
   </div>
@@ -294,8 +294,27 @@ class Constructeur:
     <p id="vide" class="vide" hidden>Aucun projet ne correspond à ces filtres. Retirez un filtre ou élargissez la recherche.</p>
   </section>
 </div>
-""" % (echapper(s["accroche"]), echapper(s["introduction"]))
-        self.page(SITE / "index.html", s["nom"], contenu, "", "projets", donnees=donnees, scripts=("catalogue.js",), classe="page-catalogue")
+""" % (echapper(s["accroche"]), echapper(s["introduction"]), self.bloc_video())
+        scripts = ("catalogue.js", "video.js") if self.video_presente() else ("catalogue.js",)
+        self.page(SITE / "index.html", s["nom"], contenu, "", "projets", donnees=donnees, scripts=scripts, classe="page-catalogue")
+
+    def video_presente(self):
+        """Le bouton n'apparaît que si interface/video/tuto.mp4 existe."""
+        return (INTERFACE / "video" / "tuto.mp4").is_file()
+
+    def bloc_video(self):
+        if not self.video_presente():
+            return ""
+        piste = ""
+        if (INTERFACE / "video" / "tuto.vtt").is_file():
+            piste = '<track kind="subtitles" srclang="fr" label="Français" src="assets/video/tuto.vtt" default>'
+        return """  <button type="button" class="bouton bouton-tuto" id="ouvrir-tuto"><span class="icone-lecture" aria-hidden="true"></span>Voir comment ça marche en 90 secondes</button>
+  <dialog class="fenetre-tuto" id="fenetre-tuto" aria-labelledby="titre-tuto">
+    <div class="fenetre-tete"><h2 id="titre-tuto">La bibliothèque en 90 secondes</h2><button type="button" class="bouton secondaire fermer-tuto">Fermer</button></div>
+    <video controls preload="none" playsinline src="assets/video/tuto.mp4">%s</video>
+    <p class="fenetre-note">Sans son : les explications s'affichent en sous-titres. Le détail écrit reste dans <a href="pages/debuter.html">Débuter</a>.</p>
+  </dialog>
+""" % piste
 
     def construire_docs(self):
         liens = {f: "%s.html" % slug for f, slug, _ in self.pages_docs}
@@ -334,6 +353,11 @@ class Constructeur:
         (SITE / "assets").mkdir()
         for nom in ("style.css", "catalogue.js", "projet.js", "proposer.js"):
             shutil.copy(str(INTERFACE / nom), str(SITE / "assets" / nom))
+        for dossier in ("polices", "video"):
+            if (INTERFACE / dossier).is_dir():
+                shutil.copytree(str(INTERFACE / dossier), str(SITE / "assets" / dossier))
+        if (INTERFACE / "video.js").is_file():
+            shutil.copy(str(INTERFACE / "video.js"), str(SITE / "assets" / "video.js"))
         projets.sort(key=lambda p: (ORDRE_STATUT.get(p["meta"]["statut"], 9), p["meta"]["titre"].lower()))
         for p in projets:
             self.construire_projet(p, projets)
