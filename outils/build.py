@@ -11,6 +11,7 @@ import json
 import re
 import shutil
 import sys
+import zipfile
 
 from commun import (
     INTERFACE, PROJETS, RACINE, ErreurFiche, analyser_filiation, analyser_fonctionnement, analyser_installation,
@@ -110,9 +111,25 @@ class Constructeur:
             "etiquettes": m.get("etiquettes", []), "langue": m["langue"],
         }
 
+    def creer_archive(self, pid, dossier):
+        """Crée telechargements/<id>.zip : le dossier du projet, avec son nom pour racine de l'archive."""
+        cible = SITE / "telechargements"
+        cible.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(str(cible / ("%s.zip" % pid)), "w", zipfile.ZIP_DEFLATED) as z:
+            for rel in fichiers_projet(dossier):
+                info = zipfile.ZipInfo("%s/%s" % (pid, rel.as_posix()), date_time=(2026, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.external_attr = 0o644 << 16
+                z.writestr(info, (dossier / rel).read_bytes())
+
     def construire_projet(self, p, tous):
         m, dossier = p["meta"], p["dossier"]
         pid = p["id"]
+        self.creer_archive(pid, dossier)
+        telecharger = (
+            '<p class="telechargement"><a class="bouton" href="../telechargements/%s.zip" download>Télécharger le projet (.zip)</a> '
+            '<span class="doux">Un seul fichier, qui contient tous les fichiers du projet.</span></p>' % echapper(pid)
+        )
         fichiers = []
         for rel in fichiers_projet(dossier):
             texte = (dossier / rel).read_text(encoding="utf-8")
@@ -246,10 +263,12 @@ class Constructeur:
     </section>
     <section class="panneau" id="panneau-installer" role="tabpanel" aria-labelledby="onglet-installer" hidden>
       <h2>Installer avec votre IA</h2>
+      %(telecharger)s
       <div id="installation"></div>
     </section>
     <section class="panneau" id="panneau-fichiers" role="tabpanel" aria-labelledby="onglet-fichiers" hidden>
       <h2>Fichiers du projet</h2>
+      %(telecharger)s
       <div id="fichiers"></div>
       <h2>Historique des versions</h2>
       <ul class="historique">%(histo)s</ul>
@@ -264,7 +283,7 @@ class Constructeur:
             "type": echapper(self.libelle("type", m["type"])), "statut_cle": echapper(m["statut"]),
             "statut": echapper(self.libelle("statut", m["statut"])), "version": echapper(m["version"]),
             "titre": echapper(m["titre"]), "resume": echapper(m["resume"]), "boutons": boutons,
-            "readme": rendre(p["corps"]), "controles": controles, "histo": histo, "aside": aside,
+            "readme": rendre(p["corps"]), "controles": controles, "histo": histo, "aside": aside, "telecharger": telecharger,
         }
         self.page(SITE / "projets" / ("%s.html" % pid), "%s — %s" % (m["titre"], self.site["nom"]), contenu, "../", "projets",
                   donnees=donnees, scripts=("projet.js",), classe="page-projet")

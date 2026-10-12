@@ -102,6 +102,8 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.005em; line-height: 1.15; text
 .bouton:hover { filter: brightness(1.08); }
 .bouton.secondaire { background: var(--surface); color: var(--encre); border-color: var(--trait-fort); }
 .bouton.lien { background: none; border: 0; color: var(--accent); text-decoration: underline; min-height: 32px; padding: 0 4px; }
+.telechargement { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 20px; }
+.telechargement .bouton { display: inline-flex; align-items: center; text-decoration: none; color: var(--bouton-texte); }
 
 /* Catalogue */
 .heros { max-width: 1280px; margin: 0 auto; padding: 56px 40px 28px; display: flex; flex-direction: column; gap: 22px; }
