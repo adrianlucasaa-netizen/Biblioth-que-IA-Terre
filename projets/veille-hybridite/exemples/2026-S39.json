@@ -1,0 +1,317 @@
+{
+  "angles_morts": "Point zéro construit en une passe : couverture solide de l'Europe, faible sur l'Afrique et le Moyen-Orient pour cette semaine précise (aucun événement hybride daté du 21 au 27/09 retenu). Volet cyber non couvert faute d'incident attribué identifié sur la période. Plusieurs sources primaires (France 3, CNN, France 24) n'ont pas pu être lues intégralement ; les faits retenus reposent sur des sources accessibles et recoupées lorsque c'était possible.",
+  "annee": 2026,
+  "bluf": "Point zéro de la veille. Semaine dense sur le flanc Est et en Europe du Nord : incendie qualifié de sabotage d'une station sol Starlink en Pologne, fermeture de l'aéroport de Berlin pour un drone, chutes de drones russes Gerbera en Roumanie et en Moldavie. Le front iranien se matérialise sur le sol britannique avec l'incident de RAF Fairford, base employée par les bombardiers américains. L'UE poursuit l'usage de son régime de sanctions hybrides en visant un relais de la FIMI russe dans les médias français. Une alerte CIA sur des drones lancés depuis des navires en Méditerranée, démentie par Paris et Rome, rappelle que l'information sur la menace est elle-même un terrain d'affrontement.",
+  "debut": "2026-09-21",
+  "evenements": [
+    {
+      "acteur": "RUS",
+      "attribution": "possible",
+      "date_evt": "2026-09-23",
+      "date_revelation": "",
+      "entite": "",
+      "evaluation": "Cible cohérente avec le ciblage des capacités qui soutiennent l'Ukraine. Attribution laissée à « possible » : les ministres décrivent un schéma général, sans imputation de cet incident précis à un service nommé.",
+      "fait": "Le soir du mercredi 23/09, un incendie a endommagé une station sol Starlink à Wola Krobowska (Mazovie). Le ministre de l'Intérieur Marcin Kierwiński s'est dit sans doute sur un acte de sabotage ; le ministre-coordinateur des services, Tomasz Siemoniak, juge l'incendie volontaire hautement probable. Le parquet enquête ; aucun auteur n'est identifié publiquement. M. Kierwiński rappelle que la plupart des incidents de ce type sont inspirés par les services russes, qui recrutent des étrangers via Telegram contre paiement en cryptomonnaie.",
+      "gravite": 2,
+      "id": "E1",
+      "lat": 51.866,
+      "lieu": "Wola Krobowska (powiat de Grójec)",
+      "lon": 20.867,
+      "pays": "Pologne",
+      "precision": "ville",
+      "sources": [
+        {
+          "date": "2026-09-28",
+          "titre": "Polskie Radio — Polish interior minister says Starlink station fire was sabotage",
+          "url": "https://polskieradio.pl/395/7784/Artykul/3736335,polish-interior-minister-says-starlink-station-fire-was-sabotage"
+        },
+        {
+          "date": "2026-09-25",
+          "titre": "Newsweek — Map shows Russian incursions, acts of sabotage across Europe this week",
+          "url": "https://www.newsweek.com/map-russian-incursions-acts-sabotage-across-europe-this-week-12487638"
+        }
+      ],
+      "theatre": "EST",
+      "titre": "Incendie d'une station sol Starlink qualifié de sabotage",
+      "type": "SAB",
+      "types_sec": []
+    },
+    {
+      "acteur": "INCONNU",
+      "attribution": "non attribué",
+      "date_evt": "2026-09-23",
+      "date_revelation": "",
+      "entite": "",
+      "evaluation": "Effet de désorganisation obtenu sans attribution possible, caractéristique de la zone grise. Date : migflug indique le 23/09, Newsweek mentionne le 25/09 ; retenu le 23/09 (source plus détaillée), à confirmer.",
+      "fait": "Un drone a été signalé vers 20 h près de la piste nord ; l'espace aérien a été fermé de 20 h 20 à 21 h 05, avec déroutements vers Dresde et Leipzig. Aucune attribution. Selon la même source, BER a enregistré 28 signalements de drones au premier semestre 2026 contre 8 sur toute l'année 2025.",
+      "gravite": 2,
+      "id": "E2",
+      "lat": 52.366,
+      "lieu": "Aéroport de Berlin-Brandebourg (BER)",
+      "lon": 13.503,
+      "pays": "Allemagne",
+      "precision": "site",
+      "sources": [
+        {
+          "date": "2026-09-24",
+          "titre": "Migflug — Berlin Brandenburg drone shutdown: BER halted",
+          "url": "https://migflug.com/afterburner/berlin-brandenburg-ber-drone-shutdown-september-2026/"
+        },
+        {
+          "date": "2026-09-25",
+          "titre": "Newsweek — Map shows Russian incursions, acts of sabotage across Europe this week",
+          "url": "https://www.newsweek.com/map-russian-incursions-acts-sabotage-across-europe-this-week-12487638"
+        }
+      ],
+      "theatre": "OUEST",
+      "titre": "Drone près de la piste nord : trafic suspendu à Berlin-Brandebourg",
+      "type": "DRO",
+      "types_sec": []
+    },
+    {
+      "acteur": "RUS",
+      "attribution": "forte",
+      "date_evt": "2026-09-24",
+      "date_revelation": "",
+      "entite": "Forces armées russes",
+      "evaluation": "Débordement du conflit ukrainien plus que provocation planifiée, mais l'ISW estime que ces incursions, intentionnelles ou non, servent la normalisation des violations d'espace aérien de l'OTAN.",
+      "fait": "Dans la nuit du 23 au 24/09, pendant une attaque massive contre l'Ukraine visant notamment les points de passage frontaliers, un drone de type Gerbera a violé l'espace aérien roumain pendant environ quatre minutes avant de s'écraser près de Solca. Le ministre de la Défense Radu Miruța a jugé nécessaire une protestation auprès de Moscou, sans attribution formelle. Pas de victime.",
+      "gravite": 2,
+      "id": "E3",
+      "lat": 47.7,
+      "lieu": "Solca (județ de Suceava)",
+      "lon": 25.84,
+      "pays": "Roumanie",
+      "precision": "ville",
+      "sources": [
+        {
+          "date": "2026-09-24",
+          "titre": "Kyiv Independent — Suspected Russian drones crash in Romania, Moldova",
+          "url": "https://kyivindependent.com/suspected-russian-drones-crash-in-romania-moldova/"
+        },
+        {
+          "date": "2026-09-25",
+          "titre": "Newsweek — Map shows Russian incursions, acts of sabotage across Europe this week",
+          "url": "https://www.newsweek.com/map-russian-incursions-acts-sabotage-across-europe-this-week-12487638"
+        }
+      ],
+      "theatre": "EST",
+      "titre": "Drone russe Gerbera écrasé en Roumanie après 4 minutes dans l'espace aérien",
+      "type": "DRO",
+      "types_sec": []
+    },
+    {
+      "acteur": "RUS",
+      "attribution": "forte",
+      "date_evt": "2026-09-24",
+      "date_revelation": "",
+      "entite": "Forces armées russes",
+      "evaluation": "Même séquence que E3. La Moldavie, hors OTAN, reste exposée à ces débordements sans parapluie collectif.",
+      "fait": "La police moldave a annoncé la découverte d'un drone de type Gerbera, employé par les forces russes, dans le district de Florești, la même nuit que l'incident roumain. Pas de victime.",
+      "gravite": 1,
+      "id": "E4",
+      "lat": 47.893,
+      "lieu": "District de Florești",
+      "lon": 28.301,
+      "pays": "Moldavie",
+      "precision": "ville",
+      "sources": [
+        {
+          "date": "2026-09-24",
+          "titre": "Kyiv Independent — Suspected Russian drones crash in Romania, Moldova",
+          "url": "https://kyivindependent.com/suspected-russian-drones-crash-in-romania-moldova/"
+        }
+      ],
+      "theatre": "EST",
+      "titre": "Drone Gerbera retrouvé dans le district de Florești",
+      "type": "DRO",
+      "types_sec": []
+    },
+    {
+      "acteur": "RUS",
+      "attribution": "possible",
+      "date_evt": "2026-09-24",
+      "date_revelation": "",
+      "entite": "",
+      "evaluation": "Menace non confirmée et démentie à Paris et Rome. À suivre comme indicateur (le scénario conteneur-drone est techniquement plausible), et comme objet informationnel : l'alerte a circulé largement avant toute vérification.",
+      "fait": "El Mundo a rapporté qu'un document de la CIA circulant entre ministères européens alertait la France, l'Italie et l'Espagne sur une opération russe de drones Gerbera dissimulés dans des conteneurs à bord de navires marchands. Le 24/09, Emmanuel Macron a déclaré que la CIA n'avait pas informé les services français d'une telle attaque ; Guido Crosetto a écrit que l'alerte ne trouvait aucune confirmation.",
+      "gravite": 1,
+      "id": "E5",
+      "lat": 40.5,
+      "lieu": "Méditerranée occidentale",
+      "lon": 5.5,
+      "pays": "Espagne, France, Italie",
+      "precision": "zone",
+      "sources": [
+        {
+          "date": "2026-09-25",
+          "titre": "Euromaidan Press — Macron denies CIA warning of Russian Mediterranean drone attack",
+          "url": "https://euromaidanpress.com/2026/09/25/macron-denies-cia-warning-russian-mediterranean-drone-attack/"
+        },
+        {
+          "date": "2026-09-28",
+          "titre": "France 24 — Hybrid warfare: the threat of Russia looms over the Mediterranean",
+          "url": "https://www.france24.com/en/europe/20260928-hybrid-warfare-the-threat-of-russia-looms-over-the-mediterranean"
+        }
+      ],
+      "theatre": "MED",
+      "titre": "Alerte CIA rapportée sur des drones lancés depuis des navires en Méditerranée",
+      "type": "DRO",
+      "types_sec": [
+        "SEA",
+        "INF"
+      ]
+    },
+    {
+      "acteur": "RUS",
+      "attribution": "officielle",
+      "date_evt": "2026-09-24",
+      "date_revelation": "",
+      "entite": "Écosystème RT",
+      "evaluation": "Premier signal clair que l'UE poursuit les relais de la FIMI russe opérant dans des médias français grand public, pas seulement les structures étatiques. Effet à suivre sur le débat français sur la liberté d'expression, exploitable par les narratifs adverses.",
+      "fait": "Le Conseil de l'UE a inscrit Xenia Fedorova, ancienne présidente et directrice de l'information de RT France, au titre du régime de sanctions contre les activités hybrides russes, pour FIMI : après la suspension de RT dans l'UE, elle a continué à diffuser des narratifs pro-russes sur l'Ukraine via CNews, Europe 1 et Le JDNews. Le régime vise désormais 81 personnes et 20 entités.",
+      "gravite": 2,
+      "id": "E6",
+      "lat": 48.857,
+      "lieu": "Paris (décision du Conseil de l'UE)",
+      "lon": 2.352,
+      "pays": "France / UE",
+      "precision": "ville",
+      "sources": [
+        {
+          "date": "2026-09-24",
+          "titre": "Conseil de l'UE — Russian hybrid threats: EU lists Xenia Fedorova over information manipulation activities",
+          "url": "https://www.consilium.europa.eu/en/press/press-releases/2026/09/24/russian-hybrid-threats-eu-lists-xenia-fedorova-over-information-manipulation-activities/"
+        }
+      ],
+      "theatre": "OUEST",
+      "titre": "L'UE sanctionne Xenia Fedorova, ex-présidente de RT France",
+      "type": "INF",
+      "types_sec": [
+        "ECO"
+      ]
+    },
+    {
+      "acteur": "IRN",
+      "attribution": "forte",
+      "date_evt": "2026-09-27",
+      "date_revelation": "",
+      "entite": "",
+      "evaluation": "Fairford accueille les bombardiers américains engagés contre l'Iran ; PJ Media (source C, à recouper) affirme que le CGRI menaçait publiquement la base depuis juillet. Le recours présumé à des exécutants locaux recrutés reproduit le schéma russe. Attribution « forte » et non « officielle » : déclaration politique, enquête en cours.",
+      "fait": "Dans la nuit du 26 au 27/09, alertée par un riverain, la police a interpellé cinq Britanniques d'une vingtaine d'années opérant trois camionnettes près de RAF Fairford ; de l'essence a été trouvée, sans engin explosif improvisé selon la police (les premiers récits de presse évoquaient des engins incendiaires). Les cinq ont été relâchés sous contrôle judiciaire. Le 01/10, un binational britannico-iranien de 27 ans a été arrêté à Londres pour préparation d'actes terroristes. La police antiterroriste examine une possible implication étatique étrangère ; selon ABC, le Premier ministre a indiqué que les autorités pensent que l'Iran a joué un rôle.",
+      "gravite": 2,
+      "id": "E7",
+      "lat": 51.682,
+      "lieu": "RAF Fairford (Gloucestershire)",
+      "lon": -1.79,
+      "pays": "Royaume-Uni",
+      "precision": "site",
+      "sources": [
+        {
+          "date": "2026-10-02",
+          "titre": "ABC News (Australie) — Counter-terrorism police arrest dual UK-Iranian national over British air base incident",
+          "url": "https://www.abc.net.au/news/2026-10-02/uk-iranian-man-arrested-over-raf-fairford/107219280"
+        },
+        {
+          "date": "2026-10-01",
+          "titre": "Times of Israel — UK-Iranian dual national arrested in London over suspected terror plot against US-run airbase",
+          "url": "https://www.timesofisrael.com/uk-iranian-dual-national-arrested-in-london-over-suspected-terror-plot-against-us-run-airbase/"
+        },
+        {
+          "date": "2026-09-27",
+          "titre": "PJ Media — Britain: arrests as explosives plot uncovered near airbase (premier récit, source C)",
+          "url": "https://pjmedia.com/catherinesalgado/2026/09/27/britain-arrests-as-explosives-plot-uncovered-near-us-airbase-tied-to-iran-operation-n4957685"
+        }
+      ],
+      "theatre": "OUEST",
+      "titre": "RAF Fairford : interpellations près d'une base utilisée contre l'Iran",
+      "type": "SAB",
+      "types_sec": [
+        "VIO",
+        "PRX"
+      ]
+    },
+    {
+      "acteur": "RUS",
+      "attribution": "officielle",
+      "date_evt": "2026-09-24",
+      "date_revelation": "",
+      "entite": "Forces aérospatiales russes",
+      "evaluation": "Activité aérienne routinière mais révélatrice de l'intégration nordique. Signal faible, retenu pour mémoire et pour la contradiction de sources.",
+      "fait": "Des chasseurs d'alerte finlandais et suédois ont identifié une formation russe (Tu-134, MiG-31, Su-30) en espace aérien international. Aucune violation. Il s'agit de la première mission d'identification conjointe des deux armées de l'air depuis leur adhésion à l'OTAN. Euronews a ensuite évoqué une violation de l'espace aérien finlandais le 27/09, non corroborée par les autres sources consultées.",
+      "gravite": 1,
+      "id": "E8",
+      "lat": 59.9,
+      "lieu": "Golfe de Finlande (espace aérien international)",
+      "lon": 25,
+      "pays": "Finlande / Suède",
+      "precision": "zone",
+      "sources": [
+        {
+          "date": "2026-09-25",
+          "titre": "Malay Mail — Finland, Sweden scramble jets to intercept Russian aircraft",
+          "url": "https://www.malaymail.com/news/world/2026/09/25/finland-sweden-scramble-jets-to-intercept-russian-aircraft/236496"
+        },
+        {
+          "date": "2026-09-28",
+          "titre": "Euronews — EU ministers plan hybrid threat response amid warnings of Russian sabotage",
+          "url": "https://www.euronews.com/2026/09/28/eu-mininsters-plan-response-to-hybrid-attacks-amid-warnings-of-russian-sabotage"
+        }
+      ],
+      "theatre": "NORD",
+      "titre": "Première interception conjointe finno-suédoise au-dessus du golfe de Finlande",
+      "type": "DRO",
+      "types_sec": []
+    }
+  ],
+  "fin": "2026-09-27",
+  "id": "2026-S39",
+  "indicateurs": [
+    "Estonie : attribution publique au renseignement russe de l'incendie d'août chez Milrem Robotics (Tallinn), annoncée les 28-29/09 — à intégrer en S40.",
+    "Royaume-Uni : suites judiciaires de Fairford (interpellation d'un binational britannico-iranien à Londres le 01/10) et éventuelle attribution formelle.",
+    "UE : formalisation du protocole d'urgence de réponse aux attaques hybrides discuté le 28/09.",
+    "Bosnie-Herzégovine : élections générales du 04/10, terrain historique d'influence russe.",
+    "France : campagnes Storm-1516 visant des médias français dans la perspective de la présidentielle 2027 (France 24, 30/09).",
+    "Mali : pression du JNIM sur les convois d'Africa Corps (embuscade de Niono, 28/09) et narratifs associés."
+  ],
+  "jugements": [
+    "Les infrastructures qui soutiennent l'effort ukrainien restent une cible prioritaire : la station Starlink de Wola Krobowska (E1) s'inscrit dans le schéma décrit le 24/09 par le renseignement militaire danois (sabotages contre industriels de défense et routes logistiques).",
+    "Les violations d'espace aérien se banalisent sur le flanc Est (E3, E4) ; l'ISW y voit une volonté de Moscou de normaliser ces incursions par leur fréquence. Le risque est l'accoutumance des opinions et des chaînes de décision.",
+    "La menace iranienne en Europe change de nature avec la guerre ouverte contre les États-Unis : l'incident de Fairford (E7) vise directement un outil militaire employé contre l'Iran, sur le sol d'un allié.",
+    "La réponse européenne se judiciarise et se collectivise (sanction de X. Fedorova, E6 ; protocole d'urgence hybride discuté par les ministres de l'UE le 28/09), mais reste lente au regard du tempo adverse.",
+    "Les alertes non confirmées (E5) produisent leur propre effet anxiogène ; elles doivent être traitées comme des indicateurs à vérifier, pas comme des faits."
+  ],
+  "redige_le": "2026-10-02",
+  "semaine": 39,
+  "tendances": "Convergence de trois leviers russes sur la même semaine (sabotage d'infrastructure, drones, pression informationnelle) et apparition d'un second acteur étatique agissant physiquement sur le sol européen (Iran). Les autorités polonaises décrivent un mode de recrutement constant : exécutants étrangers recrutés via Telegram et payés en cryptomonnaie. Côté réponse, l'UE étend son régime de sanctions hybrides (81 personnes et 20 entités au 24/09) et prépare un mécanisme de réponse collective sous le seuil de l'agression armée.",
+  "theatres": [
+    {
+      "code": "EST",
+      "synthese": "Sabotage probable d'une station Starlink près de Grójec (E1), chutes de Gerbera à Solca (Roumanie) et dans le district de Florești (Moldavie) pendant une attaque massive contre l'Ukraine visant les points de passage frontaliers (E3, E4)."
+    },
+    {
+      "code": "NORD",
+      "synthese": "Première interception conjointe finno-suédoise d'une formation russe au-dessus du golfe de Finlande, en espace aérien international (E8). Le DDIS danois juge en hausse le risque d'une attaque militaire limitée contre un pays de l'OTAN frontalier de la Russie."
+    },
+    {
+      "code": "OUEST",
+      "synthese": "Drone à l'aéroport de Berlin-Brandebourg, 45 minutes d'interruption (E2) ; incident de RAF Fairford avec soupçon d'implication iranienne (E7) ; sanction UE visant une ex-dirigeante de RT France (E6). Le 18/09, Emmanuel Macron a déclaré que la menace hybride russe s'était intensifiée."
+    },
+    {
+      "code": "MED",
+      "synthese": "Alerte rapportée par El Mundo sur des drones Gerbera dissimulés dans des conteneurs de navires marchands, démentie par Paris et jugée sans confirmation par Rome (E5)."
+    },
+    {
+      "code": "MO",
+      "synthese": "Contexte : guerre Iran–États-Unis depuis le 28/02/2026, blocus naval américain, négociations via le Qatar ; le 26/09, Donald Trump a rejeté la proposition iranienne de réouverture du détroit d'Ormuz."
+    },
+    {
+      "code": "CORNE",
+      "synthese": "Contexte : offensive houthie depuis le 08/09 (prise de Mokha et de l'île de Perim les 10-11/09, frappes sur l'Arabie saoudite), avec présence rapportée de conseillers du CGRI. Relève du conflit ouvert ; suivi au titre de l'action par proxy."
+    },
+    {
+      "code": "SAHEL",
+      "synthese": "Pas d'événement hybride sourcé et daté de la semaine identifié. Contexte : Africa Corps sous pression au Mali, embuscade revendiquée par le JNIM près de Niono le 28/09 (semaine suivante)."
+    }
+  ]
+}

@@ -339,7 +339,10 @@ class Constructeur:
             '<div id="formulaire"></div></article>'
         ) % echapper(intro)
         donnees = {
-            "vocab": {k: self.vocab[k] for k in ("type", "usage", "ia", "langue", "niveau", "controles")},
+            "vocab": dict({k: self.vocab[k] for k in ("type", "usage", "ia", "langue", "niveau")},
+                          # Le formulaire reste réservé aux exemples fictifs : seuls les quatre engagements d'origine y figurent.
+                          controles={k: self.vocab["controles"][k] for k in
+                                     ("aucune-donnee-reelle", "exemples-fictifs", "aucun-nom-adresse", "aucun-appel-reseau")}),
             "contact": self.site.get("contact_propositions", "Envoyez ce fichier à la personne qui gère la bibliothèque."),
         }
         self.page(SITE / "pages" / "proposer.html", "Proposer un projet — %s" % self.site["nom"], contenu, "../", "proposer",

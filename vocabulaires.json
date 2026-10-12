@@ -36,13 +36,16 @@
     "recommande": "Recommandé"
   },
   "donnees": {
-    "exemples-fictifs": "Exemples fictifs uniquement"
+    "exemples-fictifs": "Exemples fictifs uniquement",
+    "sources-ouvertes": "Faits réels issus de sources ouvertes citées"
   },
   "controles": {
     "aucune-donnee-reelle": "Aucune donnée réelle, aucune mention de protection.",
     "exemples-fictifs": "Tous les exemples sont fictifs.",
     "aucun-nom-adresse": "Aucun nom de personne, adresse ni identifiant.",
-    "aucun-appel-reseau": "Aucun script ne contacte un service extérieur."
+    "aucun-appel-reseau": "Aucun script ne contacte un service extérieur.",
+    "aucune-donnee-protegee": "Aucune information protégée ni non publique : tout fait réel vient d'une source ouverte.",
+    "sources-citees": "Chaque fait réel renvoie à une source ouverte datée, avec son lien."
   },
   "filiation": {
     "original": "Original",

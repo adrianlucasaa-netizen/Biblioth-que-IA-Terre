@@ -4,12 +4,12 @@ Ces règles s'appliquent à tout projet de la bibliothèque. Elles protègent le
 
 ## Règle d'or
 
-**Cette bibliothèque est hors du réseau sécurisé de la Défense. N'y publiez rien de réel.** Tous les exemples sont fictifs ou anonymisés au point d'être sans lien avec une situation réelle.
+**Cette bibliothèque est hors du réseau sécurisé de la Défense. N'y publiez rien de protégé ni de non public.** Par défaut, tous les exemples sont fictifs ou anonymisés au point d'être sans lien avec une situation réelle. Une seule exception encadrée existe : les faits de sources ouvertes (voir plus bas).
 
 ## Ce qui est interdit dans un projet
 
 - Tout document ou texte portant une mention de protection, quelle qu'elle soit.
-- Les noms de personnes réelles, de lieux ou d'unités réels, de matériels ou d'opérations réels.
+- Les noms de personnes réelles, de lieux ou d'unités réels, de matériels ou d'opérations réels (sauf dans l'exception « sources ouvertes » ci-dessous, et dans ses limites).
 - Les adresses électroniques, numéros de téléphone, adresses IP, mots de passe, clés ou jetons.
 - Les scripts qui accèdent au réseau, lancent des commandes système ou exécutent du texte comme du code.
 - Les fichiers qui ne sont pas du texte simple (formats autorisés : md, txt, py, json, csv, yaml). Taille maximale par fichier : 200 Ko.
@@ -29,7 +29,19 @@ Avant publication, l'auteur vérifie lui-même chacun de ces points, puis les in
 - Trois sections : *Le problème résolu*, *Entrées et sorties*, *Limites connues*.
 - Un fichier `fonctionnement.md` : les étapes, qui fait quoi (vous ou l'IA), avec un exemple fictif par étape.
 - Un fichier `installation.md` : la marche à suivre, commune puis par IA.
-- Au moins un exemple fictif d'entrée et de sortie attendue.
+- Au moins un exemple d'entrée et de sortie attendue : fictif, ou, dans l'exception « sources ouvertes », tiré de sources publiques citées.
+
+## Exception : faits réels de sources ouvertes
+
+Certains projets (une veille, par exemple) n'ont de sens qu'avec des faits réels. Ils peuvent déclarer `donnees: sources-ouvertes` à la place de `exemples-fictifs`, aux conditions suivantes.
+
+- **Seulement des informations publiques.** Chaque fait réel vient d'une source ouverte, datée, avec son lien. Aucune information protégée, aucune information non publique, aucune mention de protection.
+- **Les exemples sont présentés comme des exemples** : datés, non mis à jour, et jamais repris comme une situation à jour.
+- **Pas de particulier ni d'adresse.** Les titulaires de fonctions publiques, et les personnes visées par un acte officiel public (une liste de sanctions, par exemple), peuvent être nommés comme dans la source citée. Aucun nom de particulier, aucune adresse, aucun numéro.
+- **Trois contrôles à attester** à la place des quatre : `aucune-donnee-protegee`, `sources-citees`, `aucun-nom-adresse`. Les contrôles `aucune-donnee-reelle` et `exemples-fictifs` ne s'appliquent pas, car ils seraient faux.
+- **Le relecteur vérifie chaque fait réel contre sa source** avant de passer le projet à « relu ».
+- Les autres contrôles du script (mentions de protection, adresses électroniques, numéros, mots de passe, scripts) restent actifs.
+- Le formulaire « Proposer un projet » reste réservé aux exemples fictifs.
 
 ## Statuts
 

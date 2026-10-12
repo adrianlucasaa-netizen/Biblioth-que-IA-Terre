@@ -118,8 +118,9 @@ def valider_projet(projet, tous_ids, vocab):
         rapport.erreur("README.md : le titre dépasse 80 caractères.")
     if isinstance(meta.get("resume"), str) and len(meta["resume"]) > 200:
         rapport.erreur("README.md : le résumé dépasse 200 caractères.")
-    if meta.get("donnees") and meta["donnees"] != "exemples-fictifs":
-        rapport.erreur("README.md : donnees doit valoir « exemples-fictifs ».")
+    # Deux régimes de données : exemples fictifs (règle d'origine) ou faits réels de sources ouvertes (exception encadrée).
+    if meta.get("donnees") and meta["donnees"] not in ("exemples-fictifs", "sources-ouvertes"):
+        rapport.erreur("README.md : donnees doit valoir « exemples-fictifs » ou « sources-ouvertes ».")
 
     ia = meta.get("ia_compatibles", [])
     if isinstance(ia, list):
@@ -145,7 +146,13 @@ def valider_projet(projet, tous_ids, vocab):
     if not isinstance(controles, list):
         rapport.erreur("README.md : controles doit être une liste.")
     else:
-        for c in vocab["controles"]:
+        if meta.get("donnees") == "sources-ouvertes":
+            # Régime « sources ouvertes » : on n'exige pas « aucune-donnee-reelle » ni « exemples-fictifs »,
+            # qui seraient faux ; on exige à la place l'absence d'information protégée et la citation des sources.
+            requis = ["aucune-donnee-protegee", "sources-citees", "aucun-nom-adresse"]
+        else:
+            requis = ["aucune-donnee-reelle", "exemples-fictifs", "aucun-nom-adresse", "aucun-appel-reseau"]
+        for c in requis:
             if c not in controles:
                 rapport.erreur("README.md : le contrôle « %s » n'est pas attesté (%s). Vérifiez le point, puis ajoutez-le à controles."
                                % (c, vocab["controles"][c]))
