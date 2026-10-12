@@ -308,9 +308,9 @@ class Constructeur:
         piste = ""
         if (INTERFACE / "video" / "tuto.vtt").is_file():
             piste = '<track kind="subtitles" srclang="fr" label="Français" src="assets/video/tuto.vtt" default>'
-        return """  <button type="button" class="bouton bouton-tuto" id="ouvrir-tuto"><span class="icone-lecture" aria-hidden="true"></span>Voir comment ça marche en 90 secondes</button>
+        return """  <button type="button" class="bouton bouton-tuto" id="ouvrir-tuto"><span class="icone-lecture" aria-hidden="true"></span>Voir comment ça marche en vidéo</button>
   <dialog class="fenetre-tuto" id="fenetre-tuto" aria-labelledby="titre-tuto">
-    <div class="fenetre-tete"><h2 id="titre-tuto">La bibliothèque en 90 secondes</h2><button type="button" class="bouton secondaire fermer-tuto">Fermer</button></div>
+    <div class="fenetre-tete"><h2 id="titre-tuto">La bibliothèque en vidéo</h2><button type="button" class="bouton secondaire fermer-tuto">Fermer</button></div>
     <video controls preload="none" playsinline src="assets/video/tuto.mp4">%s</video>
     <p class="fenetre-note">Sans son : les explications s'affichent en sous-titres. Le détail écrit reste dans <a href="pages/debuter.html">Débuter</a>.</p>
   </dialog>
