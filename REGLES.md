@@ -27,9 +27,9 @@ Avant publication, l'auteur vérifie lui-même chacun de ces points, puis les in
 
 - Un titre, un résumé, et les champs de classement (type, usage, IA compatibles, langue, niveau).
 - Trois sections : *Le problème résolu*, *Entrées et sorties*, *Limites connues*.
-- Un fichier `fonctionnement.md` : les étapes, qui fait quoi (vous ou l'IA), avec un exemple fictif par étape.
+- Un fichier `fonctionnement.md` (facultatif pour une première proposition, à ajouter ensuite) : au moins deux étapes, qui fait quoi (vous ou l'IA), avec un exemple fictif par étape. Sans lui, l'onglet « Fonctionnement » n'apparaît pas.
 - Un fichier `installation.md` : la marche à suivre, commune puis par IA.
-- Au moins un exemple d'entrée et de sortie attendue : fictif, ou, dans l'exception « sources ouvertes », tiré de sources publiques citées.
+- Un exemple d'entrée et de sortie attendue (recommandé, facultatif pour une première proposition) : fictif, ou, dans l'exception « sources ouvertes », tiré de sources publiques citées.
 
 ## Exception : faits réels de sources ouvertes
 

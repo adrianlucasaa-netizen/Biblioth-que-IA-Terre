@@ -82,9 +82,14 @@ def lire_proposition(chemin, vocab):
     ia = donnees.get("ia_compatibles")
     if not isinstance(ia, list) or not ia or any(x not in vocab["ia"] for x in ia):
         problemes.append("Choisissez au moins une IA (valeurs autorisées : %s)." % ", ".join(vocab["ia"]))
+    # Les étapes de fonctionnement sont facultatives. Si elles sont fournies, il en faut au moins deux, complètes.
     etapes = donnees.get("etapes")
-    if not isinstance(etapes, list) or len(etapes) < 2:
-        problemes.append("Au moins deux étapes de fonctionnement sont attendues.")
+    if etapes is None:
+        etapes = donnees["etapes"] = []
+    if not isinstance(etapes, list):
+        problemes.append("Le champ « etapes » doit être une liste.")
+    elif etapes and len(etapes) < 2:
+        problemes.append("Une seule étape de fonctionnement est fournie : il en faut au moins deux (ou aucune).")
     else:
         for i, e in enumerate(etapes, start=1):
             if not isinstance(e, dict) or not une_ligne(e.get("titre")) or not une_ligne(e.get("entree")) or not une_ligne(e.get("sortie")):
@@ -218,7 +223,8 @@ def ecrire_projet(dossier, d, vocab, ident):
     if ex_out:
         (dossier / "exemples" / "sortie-attendue.md").write_text(ex_out + "\n", encoding="utf-8", newline="\n")
     (dossier / "README.md").write_text(fiche(d, vocab), encoding="utf-8", newline="\n")
-    (dossier / "fonctionnement.md").write_text(fonctionnement(d), encoding="utf-8", newline="\n")
+    if d.get("etapes"):
+        (dossier / "fonctionnement.md").write_text(fonctionnement(d), encoding="utf-8", newline="\n")
     (dossier / "installation.md").write_text(installation(d, vocab, nom_principal, bool(ex_in), bool(ex_out)), encoding="utf-8", newline="\n")
 
 

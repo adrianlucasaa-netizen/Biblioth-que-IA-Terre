@@ -5,7 +5,7 @@ Tout le monde peut proposer un projet, sans compte et sans installer quoi que ce
 ## Proposer un projet
 
 1. Ouvrez la page [Proposer un projet](proposer.html).
-2. Remplissez le formulaire : l'essentiel, le problème résolu, le contenu (le prompt, les instructions ou le code), les étapes de fonctionnement, un exemple fictif.
+2. Remplissez le formulaire : l'essentiel, le problème résolu, le contenu (le prompt, les instructions ou le code), puis, si vous le souhaitez, les étapes de fonctionnement et un exemple fictif (ces deux parties sont facultatives : on peut les ajouter plus tard).
 3. Cochez les quatre engagements : aucune donnée réelle, exemples fictifs, aucun nom ni adresse, aucun appel réseau.
 4. Cliquez sur *Vérifier et préparer ma proposition*. Le formulaire contrôle votre texte et vous signale tout ce qui ressemble à une donnée réelle (adresse électronique, numéro de téléphone, mention de protection…).
 5. Téléchargez le fichier produit et envoyez-le à la personne qui gère la bibliothèque.

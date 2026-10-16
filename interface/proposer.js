@@ -110,8 +110,8 @@
     section('3. Le contenu', 'C\'est le cœur du projet : ce que les camarades vont copier.', [
       el('div', { classe: 'champ' }, [el('label', { 'for': 'contenu', classe: 'champ-titre' }, [contenuLabel, el('span', { classe: 'requis', texte: ' (obligatoire)' })]), contenuAide, contenuZone])
     ]),
-    section('4. Comment ça marche, étape par étape', 'Entre 2 et ' + MAX_ETAPES + ' étapes. Pour chacune, dites qui agit : l\'utilisateur ou l\'IA. Ces étapes deviennent le schéma interactif de la fiche.', [etapesZone, boutonAjouter]),
-    section('5. Exemples fictifs (recommandé)', 'Un exemple d\'entrée et le résultat attendu permettent de tester le projet en deux minutes. Entièrement inventés.', [
+    section('4. Comment ça marche, étape par étape (facultatif)', 'Vous pouvez laisser cette partie vide : elle pourra être ajoutée plus tard. Si vous la remplissez, comptez au moins 2 étapes (maximum ' + MAX_ETAPES + '). Pour chacune, dites qui agit : l\'utilisateur ou l\'IA. Elles deviennent le schéma interactif de la fiche. Une étape laissée entièrement vide est ignorée.', [etapesZone, boutonAjouter]),
+    section('5. Exemples fictifs (facultatif, mais recommandé)', 'Un exemple d\'entrée et le résultat attendu permettent de tester le projet en deux minutes. Entièrement inventés. Vous pouvez les ajouter plus tard.', [
       champ('exemple_entree', 'Exemple d\'entrée', '', zone(5, '', true)),
       champ('exemple_sortie', 'Résultat attendu', '', zone(5, '', true))
     ]),
@@ -269,6 +269,9 @@
     }
     return problemes;
   }
+  function etapeRemplie(e) {
+    return !!(e.titre || e.entree || e.sortie || e.texte || e.exemple);
+  }
   function verifierChamps(s) {
     var p = [];
     [['titre', 'Le titre'], ['resume', 'Le résumé'], ['auteur', 'L\'auteur'], ['probleme', 'Le problème résolu'], ['donne', 'Ce que l\'utilisateur donne'], ['recoit', 'Ce que l\'utilisateur reçoit']].forEach(function (c) {
@@ -276,9 +279,12 @@
     });
     if (!s.ia_compatibles.length) { p.push({ id: 'ia-titre', texte: 'Cochez au moins une IA.' }); }
     if (!s.contenu) { p.push({ id: 'contenu', texte: CONTENU[s.type][0] + ' est à remplir.' }); }
-    s.etapes.forEach(function (e, i) {
-      if (!e.titre || !e.entree || !e.sortie) { p.push({ id: null, texte: 'Étape ' + (i + 1) + ' : le titre, l\'entrée et la sortie sont à remplir.' }); }
+    // Partie 4 facultative : les étapes entièrement vides ont déjà été écartées.
+    // Si l'on en remplit, chacune doit être complète, et il en faut au moins deux.
+    s.etapes.forEach(function (e) {
+      if (!e.titre || !e.entree || !e.sortie) { p.push({ id: null, texte: 'Étape ' + e.n + ' : le titre, l\'entrée et la sortie sont à remplir (ou videz entièrement l\'étape pour l\'ignorer).' }); }
     });
+    if (s.etapes.length === 1) { p.push({ id: null, texte: 'Une seule étape est remplie : il en faut au moins deux pour le schéma. Ajoutez-en une, ou videz celle-ci pour passer cette partie.' }); }
     if (s.controles.length < 4) { p.push({ id: null, texte: 'Les quatre engagements doivent être cochés.' }); }
     if (s.etiquettes.split(',').filter(function (x) { return x.trim(); }).length > 5) { p.push({ id: 'etiquettes', texte: '5 mots-clés au maximum.' }); }
     return p;
@@ -352,8 +358,10 @@
   formulaire.addEventListener('submit', function (ev) {
     ev.preventDefault();
     var s = etat();
+    s.etapes = s.etapes.map(function (e, i) { e.n = i + 1; return e; }).filter(etapeRemplie);
     var problemes = verifierChamps(s).concat(verifierSensibles(s).map(function (t) { return { id: null, texte: t }; }));
     if (problemes.length) { montrerErreurs(problemes); return; }
+    s.etapes.forEach(function (e) { delete e.n; });
     montrerResultat(s);
   });
 
