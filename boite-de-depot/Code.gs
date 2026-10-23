@@ -2,7 +2,7 @@
  * Boîte de dépôt de la Bibliothèque IA Terre.
  *
  * Ce script reçoit une proposition envoyée par le formulaire du site, retire ce qui
- * ne doit pas circuler (marquages, grades, adresses électroniques, téléphones, clés),
+ * ne doit pas circuler (marquages, noms de personnes, adresses électroniques, téléphones, clés),
  * l'enregistre dans un dossier Drive PRIVÉ et prévient les validateurs par courriel,
  * fichier joint. Il ne publie rien : la publication se fait après validation humaine.
  *
@@ -22,40 +22,92 @@ var Epurer = (function () {
   var CODE_RESEAU = /^\s*(?:import|from)\s+(socket|urllib|requests|http|httpx|ftplib|smtplib|telnetlib|paramiko|aiohttp|websockets?|ssl|xmlrpc)\b/m;
   var CODE_DANGER = /\b(os\.system|subprocess|eval\s*\(|exec\s*\(|__import__|pickle|ctypes)\b/;
 
-  // Grades en toutes lettres (insensible à la casse) et abréviations (casse exacte).
-  var GRADES_MOTS = "g[ée]n[ée]ral(?:\\s+de\\s+(?:brigade|division|corps\\s+d'arm[ée]e|l'arm[ée]e))?|colonel|lieutenant[- ]colonel|chef\\s+de\\s+bataillon|chef\\s+d'escadrons?|commandant|capitaine|sous-lieutenant|lieutenant|aspirant|adjudant-chef|adjudant|major|sergent-chef|sergent|caporal-chef|caporal|brigadier-chef|brigadier|mar[ée]chal\\s+des\\s+logis(?:-chef)?|m[ée]decin\\s+(?:g[ée]n[ée]ral|colonel|commandant|capitaine)|ing[ée]nieur\\s+g[ée]n[ée]ral";
-  var GRADES_ABREV = "GAL|Gal|COL|Col|LCL|Lcl|CDT|Cdt|CEN|CBA|CNE|Cne|CPT|Cpt|LTN|Lt|SLT|ASP|Asp|MAJ|Maj|ADC|ADJ|Adj|SCH|SGT|Sgt|CCH|CPL|Cpl|BCH|MDL|MCH";
-  var GRADE_MOT = new RegExp("(^|[^A-Za-zÀ-ÿ])(" + GRADES_MOTS + ")(\\.?)((?:[ \\t]+[A-Za-zÀ-ÿ'’-]+){1,3})", "gi");
-  var GRADE_ABR = new RegExp("(^|[^A-Za-zÀ-ÿ])(" + GRADES_ABREV + ")(\\.?)((?:[ \\t]+[A-Za-zÀ-ÿ'’-]+){1,3})", "g");
+  // Noms de personnes : « Prénom Nom », « Prénom de Nom » et « NOM Prénom » deviennent « [personne] ».
+  // Un prénom seul n'est jamais retiré. La détection s'appuie sur une liste de prénoms courants :
+  // un prénom rare ou étranger absent de la liste n'est pas reconnu (le validateur relit la fiche).
+  var PRENOMS = {};
+  [
+    "adrien|alain|albert|alexandre|alexis|alfred|andre|antoine|arnaud|arthur|aurelien|axel|baptiste|",
+    "benjamin|benoit|bernard|bertrand|bruno|cedric|charles|christian|christophe|clement|cyril|damien|",
+    "daniel|david|denis|dominique|dylan|edouard|emile|emmanuel|eric|etienne|fabien|fabrice|felix|florent|",
+    "florian|francis|franck|francois|frederic|gabriel|gaetan|gael|gerard|gilbert|gilles|guillaume|guy|",
+    "gregory|henri|herve|hugo|hugues|jacques|jean|jeremy|jerome|joel|jonathan|jordan|joseph|jules|julien|",
+    "justin|kevin|kilian|laurent|leo|leon|leonard|lionel|loic|louis|lucas|luc|ludovic|marc|marcel|",
+    "mathieu|mathis|matthieu|maurice|maxence|maxime|mehdi|michel|mickael|nathan|nicolas|noe|olivier|",
+    "pascal|patrice|patrick|paul|philippe|pierre|quentin|raphael|raymond|remi|rene|richard|robert|roger|",
+    "roland|romain|samuel|sebastien|serge|simon|stephane|sylvain|theo|thibault|thierry|thomas|timothee|",
+    "tristan|valentin|victor|vincent|vivien|william|xavier|yann|yannick|yves|yvan|zacharie|amine|karim|",
+    "mohamed|mohammed|ahmed|ali|omar|youssef|rachid|nabil|samir|hamid|farid|kamel|abdel|bilal|ibrahim|",
+    "mamadou|moussa|sofiane|anthony|jimmy|jeremie|cyrille|regis|martin|mael|ethan|enzo|evan|tom|timeo|",
+    "yanis|lilian|nolan|noah|liam|gaspard|augustin|aymeric|barthelemy|bastien|brice|corentin|didier|",
+    "dimitri|eliott|elie|fernand|gauthier|ghislain|gustave|hector|hippolyte|igor|isidore|lenny|lorenzo|",
+    "malo|mathias|melvin|morgan|nelson|norbert|octave|oscar|pablo|rodolphe|ruben|sacha|stanislas|steeve|",
+    "sullivan|tanguy|teddy|ulysse|urbain|vladimir|wilfried|yoann|zinedine|adele|agathe|agnes|aline|alice|",
+    "amandine|amelie|anais|anne|annie|anouk|aurelie|aurore|beatrice|bernadette|brigitte|camille|capucine|",
+    "carine|carole|caroline|catherine|cecile|cecilia|celine|chantal|charlotte|chloe|christelle|",
+    "christiane|christine|claire|clara|clemence|colette|corinne|claudine|constance|delphine|denise|diane|",
+    "edith|eleonore|elisa|elise|elodie|emilie|emma|estelle|eva|eve|fabienne|fanny|flora|florence|",
+    "francoise|frederique|gabrielle|genevieve|ghislaine|gisele|helene|henriette|hortense|ines|irene|",
+    "isabelle|jacqueline|jeanne|jessica|joelle|josephine|josette|julia|julie|juliette|justine|karine|",
+    "laetitia|laure|laura|laurence|lea|leila|lena|liliane|lina|lisa|lola|louise|lucie|lucile|lydie|",
+    "madeleine|magali|manon|marguerite|maria|marie|marielle|marine|marion|marthe|martine|mathilde|maud|",
+    "maude|melanie|michele|michelle|mireille|monique|myriam|nadege|nadia|nadine|natacha|nathalie|nicole|",
+    "noemie|odette|odile|olga|pascale|paulette|pauline|perrine|raymonde|rachel|rebecca|renee|rita|roxane|",
+    "sabine|sabrina|salome|sandra|sandrine|sara|sarah|severine|sidonie|simone|solange|sonia|sophie|",
+    "stephanie|suzanne|sylvie|tatiana|therese|valerie|vanessa|veronique|virginie|viviane|yolande|yvette|",
+    "yvonne|zoe|maelle|maeva|lou|jade|louna|ambre|anaelle|apolline|clementine|elena|elsa|emeline|eugenie|",
+    "fatima|amina|khadija|samira|yasmine|malika|leonie|margaux|melissa|oceane|ophelie|priscilla|penelope|",
+    "romane|rosalie|segolene|stella|tiphaine|victorine|wendy|laurie|lilou|lise|lorene|marjorie|morgane|",
+    "noa|orane|john|james|michael|peter|mark|andrew|steven|brian|jennifer|emily|linda|susan|karen|nancy|",
+    "betty|helen|donna|carol|ruth|sharon|amanda|deborah|george|edward|henry|jack|harry|oliver|jacob|mike|",
+    "bob|tim|sam|ben|jim|joe|steve|matt|chris|nick|dan|alex|kate|katie"
+  ].join("|").split("|").forEach(function (p) { PRENOMS[p] = true; });
+  var PARTICULES = { de: true, du: true, des: true, la: true, le: true, les: true, van: true, von: true, der: true, den: true, di: true, da: true, del: true, el: true, al: true, bin: true, mac: true, ter: true, ten: true };
+  var MOT = /[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'’-]*/g;
 
+  function sansAccent(s) { return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
   function majuscule(m) { return /^[A-ZÀ-ÖØ-Þ]/.test(m); }
+  function toutMajuscule(m) { return m.length >= 2 && m === m.toUpperCase() && m !== m.toLowerCase(); }
+  function estPrenom(m) {
+    if (!majuscule(m)) { return false; }
+    return m.split('-').every(function (c) { return c !== '' && PRENOMS[sansAccent(c)] === true; });
+  }
+  function estNom(m) { return m.length >= 2 && (majuscule(m) || /^[dDlL]['’][A-ZÀ-ÖØ-Þ]/.test(m)); }
 
-  // Remplace « grade Nom Prénom » par « [personne] » ; ne touche pas « le capitaine a décidé ».
-  function retirerGrades(texte, n) {
-    function rempl(match, avant, grade, point, suite) {
-      var morceaux = suite.match(/[ \t]+[A-Za-zÀ-ÿ'’-]+/g) || [];
-      var pris = 0;
-      while (pris < morceaux.length && pris < 3 && majuscule(morceaux[pris].replace(/^[ \t]+/, ''))) { pris++; }
-      if (pris === 0) { return match; }
-      n.grade++;
-      var reste = morceaux.slice(pris).join('');
-      return avant + '[personne]' + reste;
+  function retirerNoms(texte, n) {
+    var mots = [], m;
+    MOT.lastIndex = 0;
+    while ((m = MOT.exec(texte)) !== null) { mots.push({ t: m[0], d: m.index, f: m.index + m[0].length }); }
+    function colles(i) { return /^[ \t]+$/.test(texte.slice(mots[i].f, mots[i + 1].d)); }
+    var spans = [], i = 0, dernier = -1;
+    while (i < mots.length) {
+      if (!estPrenom(mots[i].t)) { i++; continue; }
+      // « Prénom Nom » : un ou deux noms, avec d'éventuelles particules (de, du, van…).
+      var fin = -1, noms = 0, k = i + 1;
+      while (noms < 2 && k < mots.length && colles(k - 1)) {
+        var p = k;
+        while (p - k < 2 && p + 1 < mots.length && PARTICULES[mots[p].t] === true && colles(p)) { p++; }
+        if (estNom(mots[p].t)) { noms++; fin = p; k = p + 1; } else { break; }
+      }
+      if (fin >= 0) { spans.push([mots[i].d, mots[fin].f]); n.nom++; dernier = fin; i = fin + 1; continue; }
+      // « NOM Prénom » : un à trois mots tout en majuscules juste avant le prénom.
+      var debut = i, c = 0;
+      while (c < 3 && debut - 1 > dernier && colles(debut - 1) && toutMajuscule(mots[debut - 1].t) &&
+             (c > 0 || mots[debut - 1].t.length >= 3)) { debut--; c++; }
+      if (c > 0) { spans.push([mots[debut].d, mots[i].f]); n.nom++; }
+      dernier = i; i++;
     }
-    // Plusieurs passes : un grade peut se trouver dans le texte déjà consommé par la précédente.
-    var avant;
-    for (var i = 0; i < 4; i++) {
-      avant = texte;
-      texte = texte.replace(GRADE_MOT, rempl).replace(GRADE_ABR, rempl);
-      if (texte === avant) { break; }
-    }
-    return texte;
+    if (!spans.length) { return texte; }
+    var res = '', pos = 0;
+    spans.forEach(function (s) { res += texte.slice(pos, s[0]) + '[personne]'; pos = s[1]; });
+    return res + texte.slice(pos);
   }
 
   function texte(brut) {
-    var n = { marquage: 0, grade: 0, courriel: 0, telephone: 0, cle: 0, ip: 0 };
+    var n = { marquage: 0, nom: 0, courriel: 0, telephone: 0, cle: 0, ip: 0 };
     var t = String(brut == null ? '' : brut);
     t = t.replace(MARQUAGES, function (m, avant) { n.marquage++; return avant; });
-    t = retirerGrades(t, n);
+    t = retirerNoms(t, n);
     t = t.replace(COURRIEL, function (m, dom) {
       if (DOMAINE_FICTIF.test(dom.toLowerCase())) { return m; }
       n.courriel++; return 'nom@example.org';
@@ -86,7 +138,7 @@ var Epurer = (function () {
   // Renvoie la proposition épurée, le décompte des retraits (jamais les valeurs retirées)
   // et des alertes à l'intention du validateur.
   function proposition(p) {
-    var total = { marquage: 0, grade: 0, courriel: 0, telephone: 0, cle: 0, ip: 0 };
+    var total = { marquage: 0, nom: 0, courriel: 0, telephone: 0, cle: 0, ip: 0 };
     var propre = parcourir(p, total);
     var alertes = [];
     if (propre && propre.type === 'script') {
@@ -103,7 +155,7 @@ var Epurer = (function () {
 })();
 // ===== EPURER:FIN =====
 
-var LIBELLES = { marquage: 'marquage', grade: 'grade (et nom associé)', courriel: 'adresse électronique', telephone: 'numéro de téléphone', cle: 'clé ou mot de passe', ip: 'adresse IP' };
+var LIBELLES = { marquage: 'marquage', nom: 'nom de personne (prénom et nom)', courriel: 'adresse électronique', telephone: 'numéro de téléphone', cle: 'clé ou mot de passe', ip: 'adresse IP' };
 var MAX_OCTETS = 200000;      // taille maximale d'un dépôt
 var MAX_PAR_HEURE = 30;       // dépôts acceptés par heure, tous émetteurs confondus
 var FORMAT = 'bibliotheque-ia-terre/proposition';
@@ -123,11 +175,11 @@ function installer() {
   Logger.log('Quota de courriels restant aujourd\'hui : ' + MailApp.getRemainingDailyQuota());
 }
 
-/** Test sans site : fabrique un faux dépôt contenant volontairement un marquage, un grade, etc. */
+/** Test sans site : fabrique un faux dépôt contenant volontairement un marquage, un nom de personne, etc. */
 function tester() {
   var faux = {
     format: FORMAT, titre: 'Essai de la boîte', resume: 'Essai. NON PROTÉGÉ', type: 'prompt',
-    auteur: 'Capitaine Dupont', probleme: 'Joindre jean.dupont@exemple.fr ou 06 12 34 56 78.',
+    auteur: 'Jean Dupont', probleme: 'Joindre jean.dupont@exemple.fr ou 06 12 34 56 78.',
     donne: 'x', recoit: 'y', contenu: 'clé : api_key = abcdefghijklmnop1234', ia_compatibles: ['claude'],
     controles: ['aucune-donnee-reelle', 'exemples-fictifs', 'aucun-nom-adresse', 'aucun-appel-reseau']
   };

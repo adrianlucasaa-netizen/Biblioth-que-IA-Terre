@@ -1,5 +1,5 @@
 /* Formulaire « Proposer un projet ». Tout se prépare dans le navigateur ; rien n'est envoyé
-   tant que le contributeur n'a pas cliqué sur « Envoyer ». Les marquages, grades, adresses,
+   tant que le contributeur n'a pas cliqué sur « Envoyer ». Les marquages, noms de personnes, adresses,
    téléphones et clés sont retirés automatiquement (epurer.js) au lieu de bloquer le dépôt. */
 (function () {
   'use strict';
@@ -92,7 +92,7 @@
   var formulaire = el('form', { novalidate: 'novalidate', classe: 'formulaire' }, [
     section('1. L\'essentiel (obligatoire)', 'Cinq informations suffisent. Tout le reste est facultatif : la personne qui relira votre dépôt le complétera avec l\'aide de l\'IA.', [
       champ('titre', 'Titre', 'Court et parlant. Exemple : Synthèse de conférence.', ligne('titre'), true),
-      champ('auteur', 'Pseudo ou prénom', 'Pas de nom complet, pas de grade ni d\'unité (ils seraient retirés).', ligne('auteur'), true),
+      champ('auteur', 'Pseudo ou prénom', 'Pas de nom complet ni d\'unité (un prénom et un nom seraient retirés).', ligne('auteur'), true),
       champ('resume', 'Résumé', 'Deux ou trois phrases : ce que fait le projet et pour qui.', zone(3), true),
       el('div', { classe: 'champ' }, [el('span', { classe: 'champ-titre', id: 'type-titre', texte: 'Type de projet' }), typeRadios]),
       el('div', { classe: 'champ' }, [el('span', { classe: 'champ-titre', id: 'ia-titre' }, [el('span', { texte: 'Testé avec' }), el('span', { classe: 'requis', texte: ' (obligatoire)' })]), el('p', { classe: 'champ-aide', texte: 'Cochez les IA avec lesquelles vous l\'avez testé. « Toutes les IA » si le projet est générique.' }), iaBoites])
@@ -297,7 +297,7 @@
     document.body.removeChild(t);
   }
 
-  var LIBELLES_RETRAITS = { marquage: 'mention de protection', grade: 'grade (avec le nom qui suit)', courriel: 'adresse de messagerie', telephone: 'numéro de téléphone', cle: 'clé ou mot de passe', ip: 'adresse IP' };
+  var LIBELLES_RETRAITS = { marquage: 'mention de protection', nom: 'nom de personne (prénom et nom)', courriel: 'adresse de messagerie', telephone: 'numéro de téléphone', cle: 'clé ou mot de passe', ip: 'adresse IP' };
 
   function phraseRetraits(retraits) {
     var l = Object.keys(LIBELLES_RETRAITS).filter(function (k) { return retraits[k]; }).map(function (k) { return retraits[k] + ' × ' + LIBELLES_RETRAITS[k]; });

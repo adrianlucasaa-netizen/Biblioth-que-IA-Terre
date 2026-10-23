@@ -66,6 +66,10 @@ def lire_proposition(chemin, vocab):
         raise ErreurProposition("Impossible de lire le fichier : %s" % e)
     if not isinstance(donnees, dict) or donnees.get("format") != FORMAT:
         raise ErreurProposition("Ce fichier n'est pas une proposition créée par le formulaire du site.")
+    donnees.pop("reception", None)   # bloc ajouté par la boîte de dépôt : jamais publié
+    validation = donnees.get("validation")
+    if validation is not None and (not isinstance(validation, dict) or not une_ligne(validation.get("par"))):
+        raise ErreurProposition("Le bloc « validation » est incomplet : il doit indiquer le pseudo du validateur (par).")
 
     problemes = []
     for cle in ("titre", "resume", "type", "usage", "niveau", "langue", "auteur", "probleme", "donne", "recoit", "contenu"):
@@ -114,6 +118,7 @@ def identifiant(donnees, existants):
 
 # -- génération des fichiers ------------------------------------------------
 def fiche(d, vocab):
+    valide = d.get("validation") if isinstance(d.get("validation"), dict) and une_ligne((d.get("validation") or {}).get("par")) else None
     controles = [c for c in CONTROLES if c in (d.get("controles") or [])]
     etiquettes = []
     for e in liste_lignes(str(d.get("etiquettes") or "").replace(",", "\n")):
@@ -129,7 +134,7 @@ def fiche(d, vocab):
         "ia_compatibles: [%s]" % ", ".join(d["ia_compatibles"]),
         "langue: " + d["langue"],
         "niveau: " + d["niveau"],
-        "statut: propose",
+        "statut: " + ("relu" if valide else "propose"),
         "version: 0.1",
         "donnees: exemples-fictifs",
         "filiation: original",
@@ -138,8 +143,12 @@ def fiche(d, vocab):
         "etiquettes: [%s]" % ", ".join(etiquettes),
         "controles: [%s]" % ", ".join(controles),
         "auteur: " + entre_guillemets(d["auteur"]),
-        'relu_par: "[pas encore relu]"',
+        "relu_par: " + (entre_guillemets(valide["par"]) if valide else '"[pas encore relu]"'),
     ]
+    if valide:
+        date = une_ligne(valide.get("date"))[:10]
+        entetes.append("validation_ia: " + entre_guillemets(
+            "Validé avec l'aide de l'IA, par %s%s" % (une_ligne(valide["par"]), (", le " + date) if date else "")))
     limites = liste_lignes(d.get("limites")) or ["Aucune limite n'a été indiquée par l'auteur : testez avec prudence."]
     adapter = bloc(d.get("adapter")) or "Adaptez les exemples et les consignes à votre cas, sans y mettre de donnée sensible."
     corps = [

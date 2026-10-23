@@ -43,37 +43,118 @@ CLE_AFFECTEE = re.compile(r"((?:api[_-]?key|jeton|token|mot[_ ]de[_ ]passe|passw
 CODE_RESEAU = re.compile(r"^\s*(?:import|from)\s+(socket|urllib|requests|http|httpx|ftplib|smtplib|telnetlib|paramiko|aiohttp|websockets?|ssl|xmlrpc)\b", re.M)
 CODE_DANGER = re.compile(r"\b(os\.system|subprocess|eval\s*\(|exec\s*\(|__import__|pickle|ctypes)\b")
 
-GRADES_MOTS = (r"g[ée]n[ée]ral(?:\s+de\s+(?:brigade|division|corps\s+d'arm[ée]e|l'arm[ée]e))?|colonel|lieutenant[- ]colonel|chef\s+de\s+bataillon|chef\s+d'escadrons?|commandant|capitaine|sous-lieutenant|lieutenant|aspirant|adjudant-chef|adjudant|major|sergent-chef|sergent|caporal-chef|caporal|brigadier-chef|brigadier|mar[ée]chal\s+des\s+logis(?:-chef)?|m[ée]decin\s+(?:g[ée]n[ée]ral|colonel|commandant|capitaine)|ing[ée]nieur\s+g[ée]n[ée]ral")
-GRADES_ABREV = "GAL|Gal|COL|Col|LCL|Lcl|CDT|Cdt|CEN|CBA|CNE|Cne|CPT|Cpt|LTN|Lt|SLT|ASP|Asp|MAJ|Maj|ADC|ADJ|Adj|SCH|SGT|Sgt|CCH|CPL|Cpl|BCH|MDL|MCH"
-_SUITE = r"((?:[ \t]+[A-Za-zÀ-ÿ'’-]+){1,3})"
-GRADE_MOT = re.compile(r"(^|[^A-Za-zÀ-ÿ])(" + GRADES_MOTS + r")(\.?)" + _SUITE, re.I)
-GRADE_ABR = re.compile(r"(^|[^A-Za-zÀ-ÿ])(" + GRADES_ABREV + r")(\.?)" + _SUITE)
-CATEGORIES = ("marquage", "grade", "courriel", "telephone", "cle", "ip")
-LIBELLES = {"marquage": "mention de protection", "grade": "grade (avec le nom qui suit)", "courriel": "adresse de messagerie",
+# Noms de personnes : « Prénom Nom », « Prénom de Nom » et « NOM Prénom » deviennent « [personne] ».
+# Un prénom seul n'est jamais retiré. La détection s'appuie sur une liste de prénoms courants :
+# un prénom rare ou étranger absent de la liste n'est pas reconnu (le validateur relit la fiche).
+PRENOMS = frozenset("|".join([
+    "adrien|alain|albert|alexandre|alexis|alfred|andre|antoine|arnaud|arthur|aurelien|axel|baptiste",
+    "benjamin|benoit|bernard|bertrand|bruno|cedric|charles|christian|christophe|clement|cyril|damien",
+    "daniel|david|denis|dominique|dylan|edouard|emile|emmanuel|eric|etienne|fabien|fabrice|felix|florent",
+    "florian|francis|franck|francois|frederic|gabriel|gaetan|gael|gerard|gilbert|gilles|guillaume|guy",
+    "gregory|henri|herve|hugo|hugues|jacques|jean|jeremy|jerome|joel|jonathan|jordan|joseph|jules|julien",
+    "justin|kevin|kilian|laurent|leo|leon|leonard|lionel|loic|louis|lucas|luc|ludovic|marc|marcel",
+    "mathieu|mathis|matthieu|maurice|maxence|maxime|mehdi|michel|mickael|nathan|nicolas|noe|olivier",
+    "pascal|patrice|patrick|paul|philippe|pierre|quentin|raphael|raymond|remi|rene|richard|robert|roger",
+    "roland|romain|samuel|sebastien|serge|simon|stephane|sylvain|theo|thibault|thierry|thomas|timothee",
+    "tristan|valentin|victor|vincent|vivien|william|xavier|yann|yannick|yves|yvan|zacharie|amine|karim",
+    "mohamed|mohammed|ahmed|ali|omar|youssef|rachid|nabil|samir|hamid|farid|kamel|abdel|bilal|ibrahim",
+    "mamadou|moussa|sofiane|anthony|jimmy|jeremie|cyrille|regis|martin|mael|ethan|enzo|evan|tom|timeo",
+    "yanis|lilian|nolan|noah|liam|gaspard|augustin|aymeric|barthelemy|bastien|brice|corentin|didier",
+    "dimitri|eliott|elie|fernand|gauthier|ghislain|gustave|hector|hippolyte|igor|isidore|lenny|lorenzo",
+    "malo|mathias|melvin|morgan|nelson|norbert|octave|oscar|pablo|rodolphe|ruben|sacha|stanislas|steeve",
+    "sullivan|tanguy|teddy|ulysse|urbain|vladimir|wilfried|yoann|zinedine|adele|agathe|agnes|aline|alice",
+    "amandine|amelie|anais|anne|annie|anouk|aurelie|aurore|beatrice|bernadette|brigitte|camille|capucine",
+    "carine|carole|caroline|catherine|cecile|cecilia|celine|chantal|charlotte|chloe|christelle",
+    "christiane|christine|claire|clara|clemence|colette|corinne|claudine|constance|delphine|denise|diane",
+    "edith|eleonore|elisa|elise|elodie|emilie|emma|estelle|eva|eve|fabienne|fanny|flora|florence",
+    "francoise|frederique|gabrielle|genevieve|ghislaine|gisele|helene|henriette|hortense|ines|irene",
+    "isabelle|jacqueline|jeanne|jessica|joelle|josephine|josette|julia|julie|juliette|justine|karine",
+    "laetitia|laure|laura|laurence|lea|leila|lena|liliane|lina|lisa|lola|louise|lucie|lucile|lydie",
+    "madeleine|magali|manon|marguerite|maria|marie|marielle|marine|marion|marthe|martine|mathilde|maud",
+    "maude|melanie|michele|michelle|mireille|monique|myriam|nadege|nadia|nadine|natacha|nathalie|nicole",
+    "noemie|odette|odile|olga|pascale|paulette|pauline|perrine|raymonde|rachel|rebecca|renee|rita|roxane",
+    "sabine|sabrina|salome|sandra|sandrine|sara|sarah|severine|sidonie|simone|solange|sonia|sophie",
+    "stephanie|suzanne|sylvie|tatiana|therese|valerie|vanessa|veronique|virginie|viviane|yolande|yvette",
+    "yvonne|zoe|maelle|maeva|lou|jade|louna|ambre|anaelle|apolline|clementine|elena|elsa|emeline|eugenie",
+    "fatima|amina|khadija|samira|yasmine|malika|leonie|margaux|melissa|oceane|ophelie|priscilla|penelope",
+    "romane|rosalie|segolene|stella|tiphaine|victorine|wendy|laurie|lilou|lise|lorene|marjorie|morgane",
+    "noa|orane|john|james|michael|peter|mark|andrew|steven|brian|jennifer|emily|linda|susan|karen|nancy",
+    "betty|helen|donna|carol|ruth|sharon|amanda|deborah|george|edward|henry|jack|harry|oliver|jacob|mike",
+    "bob|tim|sam|ben|jim|joe|steve|matt|chris|nick|dan|alex|kate|katie"
+]).split("|"))
+PARTICULES = frozenset("de du des la le les van von der den di da del el al bin mac ter ten".split())
+MOT = re.compile(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'’-]*")
+CATEGORIES = ("marquage", "nom", "courriel", "telephone", "cle", "ip")
+LIBELLES = {"marquage": "mention de protection", "nom": "nom de personne (prénom et nom)", "courriel": "adresse de messagerie",
             "telephone": "numéro de téléphone", "cle": "clé ou mot de passe", "ip": "adresse IP"}
+
+
+def _sans_accent(s):
+    return re.sub(r"[\u0300-\u036f]", "", unicodedata.normalize("NFD", s)).lower()
 
 
 def _majuscule(m):
     return bool(re.match(r"^[A-ZÀ-ÖØ-Þ]", m))
 
 
-def _retirer_grades(texte, n):
-    def rempl(m):
-        avant, suite = m.group(1), m.group(4)
-        morceaux = re.findall(r"[ \t]+[A-Za-zÀ-ÿ'’-]+", suite)
-        pris = 0
-        while pris < len(morceaux) and pris < 3 and _majuscule(morceaux[pris].lstrip(" \t")):
-            pris += 1
-        if pris == 0:
-            return m.group(0)
-        n["grade"] += 1
-        return avant + "[personne]" + "".join(morceaux[pris:])
-    for _ in range(4):
-        avant = texte
-        texte = GRADE_ABR.sub(rempl, GRADE_MOT.sub(rempl, texte))
-        if texte == avant:
-            break
-    return texte
+def _tout_majuscule(m):
+    return len(m) >= 2 and m == m.upper() and m != m.lower()
+
+
+def _est_prenom(m):
+    if not _majuscule(m):
+        return False
+    return all(c != "" and _sans_accent(c) in PRENOMS for c in m.split("-"))
+
+
+def _est_nom(m):
+    return len(m) >= 2 and (_majuscule(m) or bool(re.match(r"^[dDlL]['’][A-ZÀ-ÖØ-Þ]", m)))
+
+
+def _retirer_noms(texte, n):
+    mots = [(m.group(0), m.start(), m.end()) for m in MOT.finditer(texte)]
+
+    def colles(i):
+        return bool(re.fullmatch(r"[ \t]+", texte[mots[i][2]:mots[i + 1][1]]))
+    spans, i, dernier = [], 0, -1
+    while i < len(mots):
+        if not _est_prenom(mots[i][0]):
+            i += 1
+            continue
+        fin, noms, k = -1, 0, i + 1
+        while noms < 2 and k < len(mots) and colles(k - 1):
+            p = k
+            while p - k < 2 and p + 1 < len(mots) and mots[p][0] in PARTICULES and colles(p):
+                p += 1
+            if _est_nom(mots[p][0]):
+                noms += 1
+                fin = p
+                k = p + 1
+            else:
+                break
+        if fin >= 0:
+            spans.append((mots[i][1], mots[fin][2]))
+            n["nom"] += 1
+            dernier = fin
+            i = fin + 1
+            continue
+        debut, c = i, 0
+        while (c < 3 and debut - 1 > dernier and colles(debut - 1) and _tout_majuscule(mots[debut - 1][0])
+               and (c > 0 or len(mots[debut - 1][0]) >= 3)):
+            debut -= 1
+            c += 1
+        if c > 0:
+            spans.append((mots[debut][1], mots[i][2]))
+            n["nom"] += 1
+        dernier = i
+        i += 1
+    if not spans:
+        return texte
+    res, pos = "", 0
+    for d, f in spans:
+        res += texte[pos:d] + "[personne]"
+        pos = f
+    return res + texte[pos:]
 
 
 def epurer_texte(brut):
@@ -84,7 +165,7 @@ def epurer_texte(brut):
         n["marquage"] += 1
         return m.group(1)
     t = MARQUAGES.sub(marq, t)
-    t = _retirer_grades(t, n)
+    t = _retirer_noms(t, n)
 
     def mail(m):
         if DOMAINE_FICTIF.search(m.group(1).lower()):
@@ -195,7 +276,7 @@ def analyser(chemin):
     if manquants:
         problemes.append("Engagements non cochés : %s." % ", ".join(manquants))
     if "[personne]" in (propre.get("auteur") or ""):
-        problemes.append("Le pseudo de l'auteur contenait un grade, un nom ou une unité : il a été remplacé par « [personne] ». Demandez-en un autre au validateur (option --auteur).")
+        problemes.append("Le pseudo de l'auteur contenait un nom de personne ou une unité : il a été remplacé par « [personne] ». Demandez-en un autre au validateur (option --auteur).")
     a_completer = [c for c in COMPLETABLES if _vide(propre.get(c))]
     etapes = propre.get("etapes")
     if isinstance(etapes, list) and len(etapes) == 1:

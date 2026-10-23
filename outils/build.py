@@ -7,6 +7,7 @@ Le site généré fonctionne par simple double-clic sur site/index.html :
 aucun serveur, aucun réseau, aucune installation.
 La génération refuse de continuer si un projet n'est pas valide.
 """
+import hashlib
 import json
 import re
 import shutil
@@ -72,10 +73,19 @@ class Constructeur:
             "pied_droite": echapper(s["pied_droite"]),
             "classe_corps": classe,
             "donnees": ('<script type="application/json" id="donnees">%s</script>' % js_json(donnees)) if donnees is not None else "",
-            "scripts": "".join('<script src="%sassets/%s"></script>' % (racine, nom) for nom in scripts),
+            "scripts": "".join('<script src="%sassets/%s?v=%s"></script>' % (racine, nom, self.version(nom)) for nom in scripts),
         }
         chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
-        chemin_sortie.write_text(remplir(self.gabarit, valeurs), encoding="utf-8")
+        html = remplir(self.gabarit, valeurs)
+        # « ?v= » change à chaque modification de la feuille de style : les navigateurs rechargent la nouvelle version.
+        html = html.replace('assets/style.css"', 'assets/style.css?v=%s"' % self.version("style.css"))
+        chemin_sortie.write_text(html, encoding="utf-8")
+
+    def version(self, nom):
+        """Empreinte courte d'un fichier de l'interface. Elle change dès que le fichier change, ce qui oblige
+        les navigateurs à télécharger la nouvelle version au lieu de garder l'ancienne en mémoire."""
+        f = INTERFACE / nom
+        return hashlib.sha256(f.read_bytes()).hexdigest()[:10] if f.is_file() else "0"
 
     # -- projets ------------------------------------------------------------
     def lire_tous(self):
@@ -227,6 +237,7 @@ class Constructeur:
             facette("Licence", "<span>%s</span>" % echapper(m["licence"])),
             facette("Auteur", "<span>%s</span>" % echapper(m["auteur"])),
             facette("Relu par", "<span>%s</span>" % echapper(m["relu_par"])),
+            facette("Validation", "<span>%s</span>" % echapper(m["validation_ia"])) if m.get("validation_ia") else "",
         ])
 
         histo = "".join(
@@ -353,7 +364,7 @@ class Constructeur:
         contenu = (
             '<article class="doc doc-page page-formulaire"><h1>Proposer un projet</h1><p class="chapeau">%s</p>'
             '<p class="avis-regle"><strong>Avant de commencer :</strong> aucune donnée réelle, aucun nom, aucune adresse. '
-            'Si une mention de protection, un grade, une adresse de messagerie, un numéro de téléphone ou une clé se glisse dans votre texte, '
+            'Si une mention de protection, un nom de personne, une adresse de messagerie, un numéro de téléphone ou une clé se glisse dans votre texte, '
             'il sera retiré automatiquement avant l\'envoi : votre dépôt ne sera pas refusé. Les <a href="regles.html">règles de publication</a> expliquent pourquoi.</p>'
             '<noscript><p class="avis-js">Ce formulaire demande JavaScript.</p></noscript>'
             '<div id="formulaire"></div></article>'

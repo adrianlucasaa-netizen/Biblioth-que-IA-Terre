@@ -17,13 +17,17 @@ Sur Claude Code : copiez le dossier `valider-depot` dans `~/.claude/skills/`.
 4. Claude présente ce qui a été retiré et ce qu'il complète, vous demande votre pseudo de validateur, puis vous remet **un seul fichier** : `valide-….json`. La fiche de validation s'affiche dans la conversation (elle est aussi rangée dans le fichier).
 5. Relisez la fiche. Si quelque chose ne va pas, dites-le dans la conversation : il corrige et refait le fichier.
 
-## 3. Déposer le résultat
-Déposez ce fichier unique `valide-….json` dans le dossier `validations/` du dépôt GitHub de la bibliothèque (**Add file**, **Upload files**). Rien n'est publié avant la fusion par un administrateur.
+## 3. Déposer le résultat (compte GitHub avec droit d'écriture)
+1. Sur GitHub, ouvrez le dossier `validations` du dépôt de la bibliothèque, puis **Add file**, **Upload files**.
+2. Glissez le fichier unique `valide-….json`.
+3. En bas, choisissez **Create a new branch for this commit and start a pull request**, puis **Propose changes**, puis **Create pull request**.
+4. Le robot fabrique le projet et l'ajoute à la demande de fusion (suivi dans l'onglet **Actions** : coche verte = conforme, croix rouge = motif affiché).
+5. Rien n'est publié avant la fusion par un administrateur.
 
 ## Ce que le skill ne fait jamais
 - Il ne modifie pas le contenu du contributeur (prompt, skill, code) : il le copie tel quel, aux éléments épurés près.
 - Il n'écrase pas ce que le contributeur a renseigné.
 - Il ne publie rien, n'envoie rien, n'accède à aucun réseau.
-- Il refuse de produire le fichier si un nom, un grade, un marquage, une adresse, un téléphone ou une clé subsiste.
+- Il refuse de produire le fichier si un nom de personne (prénom et nom), un marquage, une adresse, un téléphone ou une clé subsiste.
 
 Si une clé ou un mot de passe figurait dans le dépôt, il a déjà circulé par courriel : prévenez l'auteur pour qu'il la révoque.

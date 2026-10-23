@@ -25,7 +25,7 @@ CHAMPS_OBLIGATOIRES = [
     "statut", "version", "donnees", "filiation", "licence", "controles",
     "auteur", "relu_par",
 ]
-CHAMPS_FACULTATIFS = ["version_plus_recente", "etiquettes"]
+CHAMPS_FACULTATIFS = ["version_plus_recente", "etiquettes", "validation_ia"]
 
 
 class ErreurFiche(Exception):

@@ -1,0 +1,45 @@
+name: Intégrer un dépôt validé
+
+# Un validateur dépose « valide-xxx.json » dans validations/ sur une branche (jamais directement sur main).
+# Le robot fabrique le projet, le vérifie et l'ajoute à cette branche. Seules les personnes qui ont le
+# droit d'écriture sur le dépôt peuvent pousser une branche : personne d'autre ne peut déclencher le robot.
+on:
+  push:
+    branches-ignore: [main]
+    paths:
+      - "validations/*.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: validations-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  integrer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fabriquer les projets à partir des fichiers validés
+        run: python outils/integrer_validations.py
+      - name: Vérifier tous les projets
+        run: python outils/valider.py
+      - name: Générer le site (contrôle)
+        run: python outils/build.py
+      - name: Enregistrer sur la branche
+        run: |
+          git config user.name "robot-bibliotheque"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projets validations
+          if git diff --cached --quiet; then
+            echo "Rien à enregistrer."
+          else
+            git commit -m "Robot : intégration des dépôts validés"
+            git push
+          fi
