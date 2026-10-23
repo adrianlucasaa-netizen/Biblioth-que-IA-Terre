@@ -2,24 +2,34 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{titre_page}}</title>
-<script>document.documentElement.classList.add('js');</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('bib-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}</script>
+<link rel="icon" href="{{racine}}assets/insigne.png">
 <link rel="stylesheet" href="{{racine}}assets/style.css">
 </head>
 <body class="{{classe_corps}}">
 <a class="lien-evitement" href="#principal">Aller au contenu</a>
-{{bandeau}}
-<header class="entete">
-  <a class="marque" href="{{racine}}index.html"><span class="marque-nom">{{nom}}</span><span class="marque-sous">{{sous_nom}}</span></a>
-  <nav class="navigation" aria-label="Navigation principale">{{nav}}</nav>
-</header>
-<main id="principal">
+<div id="techno" aria-hidden="true"></div>
+{{garde}}
+<div class="wrap">
+  <div class="mention">{{protection}}</div>
+  <header class="brand">
+    <div class="deco" aria-hidden="true"><svg viewBox="0 0 600 110" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M0 30h120l20 20h140l20-20h300"/><path d="M0 80h80l20-20h160l20 20h320"/><path d="M200 50v-30M330 60v40M440 30v-25M520 80v25"/><g fill="currentColor" stroke="none"><circle cx="120" cy="30" r="3.5"/><circle cx="280" cy="50" r="3.5"/><circle cx="100" cy="60" r="3.5"/><circle cx="280" cy="80" r="3.5"/><circle cx="440" cy="5" r="3.5"/><circle cx="520" cy="105" r="3.5"/><circle cx="200" cy="20" r="3.5"/></g></svg></div>
+    <a class="brand-btn" href="{{racine}}index.html" aria-label="Accueil de la bibliothèque">
+      <img class="logo" src="{{racine}}assets/insigne.png" alt="Insigne de l'École de Guerre – Terre" width="56" height="67">
+      <span class="wm"><b>{{nom}} <em>{{sous_nom}}</em></b><small>{{signature}}</small><span class="tricolore" role="img" aria-label="Drapeau français"></span></span>
+    </a>
+    <div class="hdr-r">
+      <button type="button" class="iconbtn" id="theme" aria-label="Changer de thème"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+    </div>
+  </header>
+  <main id="principal" class="stack">
 {{contenu}}
-</main>
-<footer class="pied">
-  <div class="pied-interieur"><span>{{pied}}</span><span class="mono majuscules">{{pied_droite}}</span></div>
-</footer>
+  </main>
+  <footer class="pied"><span class="prot">{{protection}}</span><span>{{pied}}</span><span>{{pied_droite}}</span></footer>
+</div>
+<nav class="tabbar" aria-label="Rubriques"><div class="in">{{nav}}</div></nav>
 <noscript><p class="avis-js">Les filtres, les schémas et la visionneuse de fichiers demandent JavaScript, activé par défaut dans les navigateurs.</p></noscript>
 {{donnees}}
 {{scripts}}

@@ -1,6 +1,8 @@
 {
   "nom": "Bibliothèque IA",
   "sous_nom": "TERRE",
+  "signature": "Solutions IA partagées",
+  "protection": "NON PROTÉGÉ",
   "accroche": "Les solutions IA de la communauté Terre, expliquées pas à pas.",
   "introduction": "Prompts, skills, scripts et projets testés par des camarades. Chaque fiche dit ce que fait la solution, comment elle fonctionne, et comment l'installer avec Claude, ChatGPT, Mistral ou Gemini.",
   "pied": "Lecture ouverte à tous. Chaque proposition est relue avant publication.",

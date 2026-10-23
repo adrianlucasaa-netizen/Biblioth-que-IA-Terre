@@ -1,22 +1,20 @@
-/* Catalogue : filtres à facettes, recherche et cartes. JavaScript sans dépendance. */
+/* Catalogue : recherche, puces de type, listes de filtres et cartes. JavaScript sans dépendance.
+   L'état des filtres est gardé dans l'adresse (#type=skill&usage=…) : un lien partagé rouvre la même sélection. */
 (function () {
   'use strict';
 
   var D = JSON.parse(document.getElementById('donnees').textContent);
   var VOC = D.vocab;
   var PROJETS = D.projets;
-  var GROUPES = [
-    { cle: 'type', titre: 'Type' },
-    { cle: 'usage', titre: 'Usage' },
-    { cle: 'ia', titre: 'Compatible avec' },
-    { cle: 'niveau', titre: 'Niveau' },
-    { cle: 'statut', titre: 'Statut' }
+  var LISTES = [
+    { cle: 'usage', tous: 'Tous les usages' },
+    { cle: 'ia', tous: 'Toutes les IA' },
+    { cle: 'niveau', tous: 'Tous niveaux' },
+    { cle: 'statut', tous: 'Tous statuts' }
   ];
   var CLES = ['type', 'usage', 'ia', 'niveau', 'statut', 'tag', 'q'];
+  var FILTRES = ['type', 'usage', 'ia', 'niveau', 'statut'];
   var etat = { type: '', usage: '', ia: '', niveau: '', statut: '', tag: '', q: '' };
-  var mobile = window.matchMedia && window.matchMedia('(max-width: 700px)').matches;
-  var ouverts = { type: !mobile, usage: !mobile, ia: !mobile, niveau: false, statut: !mobile };
-  var focusARendre = null;
 
   function normaliser(s) {
     return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -55,6 +53,7 @@
     return true;
   }
 
+  // Nombre de projets si l'on choisissait cette valeur, les autres filtres restant en place.
   function compter(cle, valeur) {
     var e = {};
     CLES.forEach(function (k) { e[k] = etat[k]; });
@@ -66,7 +65,7 @@
     var params = new URLSearchParams(location.hash.replace(/^#/, ''));
     CLES.forEach(function (k) {
       var v = params.get(k) || '';
-      if (GROUPES.some(function (g) { return g.cle === k; }) && v && !(v in VOC[k])) { v = ''; }
+      if (FILTRES.indexOf(k) >= 0 && v && !(v in VOC[k])) { v = ''; }
       etat[k] = v;
     });
   }
@@ -80,77 +79,95 @@
     } catch (e) { /* certains navigateurs refusent en local : sans conséquence */ }
   }
 
-  function basculer(cle, valeur) {
-    etat[cle] = etat[cle] === valeur ? '' : valeur;
-    focusARendre = { cle: cle, valeur: valeur };
-    majTout();
-  }
-
-  function libelleFiltre(cle, valeur) {
-    if (cle === 'tag') { return 'étiquette : ' + valeur; }
-    if (cle === 'q') { return '« ' + valeur + ' »'; }
-    return VOC[cle][valeur];
-  }
-
-  function dessinerFiltres() {
-    var zone = document.getElementById('filtres');
+  function dessinerPucesType() {
+    var zone = document.getElementById('puces-type');
+    var focus = document.activeElement && zone.contains(document.activeElement) ? document.activeElement.getAttribute('data-valeur') : null;
     zone.textContent = '';
-    GROUPES.forEach(function (g) {
-      var valeurs = Object.keys(VOC[g.cle]).filter(function (v) { return !(g.cle === 'ia' && v === 'toutes'); });
-      var liste = el('div', { classe: 'valeurs' });
-      valeurs.forEach(function (v) {
-        var n = compter(g.cle, v);
-        var actif = etat[g.cle] === v;
-        var b = el('button', {
-          type: 'button', classe: 'valeur-filtre', 'aria-pressed': actif ? 'true' : 'false',
-          'data-cle': g.cle, 'data-valeur': v
-        }, [
-          el('span', { texte: VOC[g.cle][v] }),
-          el('span', { classe: 'nombre', texte: String(n) })
-        ]);
-        if (n === 0 && !actif) { b.disabled = true; }
-        b.addEventListener('click', function () { basculer(g.cle, v); });
-        liste.appendChild(b);
-      });
-      var d = el('details', { classe: 'groupe-filtre' }, [el('summary', { texte: g.titre }), liste]);
-      if (ouverts[g.cle]) { d.open = true; }
-      d.addEventListener('toggle', function () { ouverts[g.cle] = d.open; });
-      zone.appendChild(d);
+    var valeurs = [''].concat(Object.keys(VOC.type));
+    valeurs.forEach(function (v) {
+      var actif = etat.type === v;
+      var b = el('button', { type: 'button', classe: 'chip', 'aria-pressed': actif ? 'true' : 'false', 'data-valeur': v });
+      if (v) {
+        b.style.setProperty('--tc', 'var(--t-' + v + ')');
+        b.appendChild(el('i', { 'aria-hidden': 'true' }));
+      }
+      b.appendChild(el('span', { texte: v ? VOC.type[v] : 'Tous' }));
+      b.appendChild(el('span', { classe: 'chip-n', texte: String(compter('type', v)) }));
+      b.addEventListener('click', function () { etat.type = v; majTout(); });
+      zone.appendChild(b);
     });
+    if (focus !== null) {
+      var cible = zone.querySelector('[data-valeur="' + focus + '"]');
+      if (cible) { cible.focus(); }
+    }
   }
+
+  function dessinerListes() {
+    var zone = document.getElementById('selecteurs');
+    var focus = document.activeElement && zone.contains(document.activeElement) ? document.activeElement.id : null;
+    zone.textContent = '';
+    LISTES.forEach(function (g) {
+      var s = el('select', { id: 'filtre-' + g.cle, 'aria-label': g.tous });
+      s.appendChild(el('option', { value: '', texte: g.tous }));
+      Object.keys(VOC[g.cle]).forEach(function (v) {
+        if (g.cle === 'ia' && v === 'toutes') { return; }
+        var n = compter(g.cle, v);
+        var o = el('option', { value: v, texte: VOC[g.cle][v] + ' (' + n + ')' });
+        if (n === 0 && etat[g.cle] !== v) { o.disabled = true; }
+        s.appendChild(o);
+      });
+      s.value = etat[g.cle];
+      if (etat[g.cle]) { s.className = 'actif'; }
+      s.addEventListener('change', function () { etat[g.cle] = s.value; majTout(); });
+      zone.appendChild(s);
+    });
+    if (focus) {
+      var cible = document.getElementById(focus);
+      if (cible) { cible.focus(); }
+    }
+  }
+
+  function pill(classe, texte) { return el('span', { classe: 'pill ' + classe, texte: texte }); }
 
   function dessinerCartes(liste) {
     var zone = document.getElementById('cartes');
     zone.textContent = '';
     liste.forEach(function (p) {
-      var puces = el('div', { classe: 'puces' }, p.ia.map(function (i) { return el('span', { classe: 'puce', texte: VOC.ia[i] }); }));
-      var carte = el('a', { classe: 'carte', href: 'projets/' + p.id + '.html' }, [
-        el('div', { classe: 'carte-tete' }, [
-          el('span', { classe: 'etiquette-mono', texte: VOC.type[p.type] }),
-          el('span', { classe: 'statut statut-' + p.statut, texte: VOC.statut[p.statut] })
-        ]),
-        el('h2', { texte: p.titre }),
-        el('p', { texte: p.resume }),
-        puces,
-        el('div', { classe: 'carte-pied', texte: VOC.usage[p.usage] + ' · Niveau : ' + VOC.niveau[p.niveau] })
+      var meta = el('span', { classe: 'meta' }, [
+        el('span', { classe: 'statut statut-' + p.statut, texte: VOC.statut[p.statut] }),
+        pill('plain', 'v' + p.version)
+      ].concat(p.ia.map(function (i) { return pill('plain', VOC.ia[i]); })).concat([
+        el('span', { classe: 'count', texte: 'Niveau : ' + VOC.niveau[p.niveau] })
+      ]));
+      var carte = el('a', { classe: 'tool', href: 'projets/' + p.id + '.html' }, [
+        el('span', { classe: 'row' }, [pill('type', VOC.type[p.type]), pill('plain', VOC.usage[p.usage])]),
+        el('span', { classe: 't', texte: p.titre }),
+        el('span', { classe: 'r', texte: p.resume }),
+        meta
       ]);
+      carte.style.setProperty('--tc', 'var(--t-' + p.type + ')');
       zone.appendChild(carte);
     });
+  }
+
+  function libelleFiltre(cle, valeur) {
+    if (cle === 'tag') { return 'Étiquette : ' + valeur; }
+    return VOC[cle][valeur];
   }
 
   function dessinerPucesActives() {
     var zone = document.getElementById('puces-actives');
     zone.textContent = '';
-    CLES.forEach(function (k) {
-      if (!etat[k] || k === 'q') { return; }
-      var b = el('button', { type: 'button', classe: 'puce-active', 'aria-label': 'Retirer le filtre ' + libelleFiltre(k, etat[k]) }, [
+    ['tag'].concat(FILTRES).forEach(function (k) {
+      if (!etat[k]) { return; }
+      var b = el('button', { type: 'button', classe: 'chip chip-active', 'aria-label': 'Retirer le filtre ' + libelleFiltre(k, etat[k]) }, [
         el('span', { texte: libelleFiltre(k, etat[k]) }), el('span', { texte: '×', 'aria-hidden': 'true' })
       ]);
-      b.style.border = '0';
-      b.style.cursor = 'pointer';
       b.addEventListener('click', function () { etat[k] = ''; majTout(); });
       zone.appendChild(b);
     });
+    var actifs = CLES.some(function (k) { return etat[k]; });
+    document.getElementById('puces-actives-ligne').hidden = !actifs;
   }
 
   function majTout() {
@@ -159,22 +176,16 @@
       var d = D.ordre_statut[a.statut] - D.ordre_statut[b.statut];
       return d !== 0 ? d : a.titre.localeCompare(b.titre, 'fr');
     });
-    dessinerFiltres();
+    dessinerPucesType();
+    dessinerListes();
     dessinerCartes(liste);
     dessinerPucesActives();
     document.getElementById('compteur').textContent =
-      liste.length + (liste.length > 1 ? ' projets affichés' : ' projet affiché') + ' sur ' + PROJETS.length;
+      liste.length + (liste.length > 1 ? ' solutions' : ' solution') + ' sur ' + PROJETS.length;
     document.getElementById('vide').hidden = liste.length !== 0;
-    var actifs = CLES.some(function (k) { return etat[k]; });
-    document.getElementById('reinitialiser').hidden = !actifs;
     var champ = document.getElementById('recherche');
     if (champ.value !== etat.q) { champ.value = etat.q; }
     ecrireHash();
-    if (focusARendre) {
-      var cible = document.querySelector('.valeur-filtre[data-cle="' + focusARendre.cle + '"][data-valeur="' + focusARendre.valeur + '"]');
-      if (cible && !cible.disabled) { cible.focus(); }
-      focusARendre = null;
-    }
   }
 
   document.getElementById('recherche').addEventListener('input', function (e) {
