@@ -179,7 +179,13 @@ function traiter_(enveloppe) {
 
   var props = PropertiesService.getScriptProperties();
   var epure = Epurer.proposition(p);
-  var json = JSON.stringify(epure.proposition, null, 2);
+  // Le fichier transmis aux validateurs porte un bloc « reception » (ce qui a été retiré, alertes) que le
+  // skill de validation lit puis retire : il n'est jamais publié.
+  var recu = Utilities.formatDate(new Date(), 'Europe/Paris', "yyyy-MM-dd'T'HH:mm:ssXXX");
+  var fichier = {};
+  Object.keys(epure.proposition).forEach(function (k) { fichier[k] = epure.proposition[k]; });
+  fichier.reception = { recu_le: recu, retraits: epure.retraits, alertes: epure.alertes, boite: 1 };
+  var json = JSON.stringify(fichier, null, 2);
   var nom = nomFichier_(p.titre);
 
   var dossierId = props.getProperty('DOSSIER_ID');
@@ -203,8 +209,12 @@ function traiter_(enveloppe) {
     epure.alertes.length ? '\nÀ VÉRIFIER :\n- ' + epure.alertes.join('\n- ') : '',
     '',
     'Fichier joint : ' + nom,
-    'Pour valider : donnez ce fichier au skill de validation de la bibliothèque.',
-    'Rien n\'est publié tant que le dépôt n\'a pas été validé.'
+    '',
+    'POUR VALIDER (le skill « valider-depot » doit être installé dans votre Claude) :',
+    '1. Enregistrez le fichier joint sur votre ordinateur.',
+    '2. Ouvrez une conversation Claude et glissez-y le fichier.',
+    '3. Écrivez : Valide ce dépôt avec le skill valider-depot.',
+    'Rien n\'est publié tant que le dépôt n\'a pas été validé et fusionné.'
   ].join('\n');
 
   var dest = (props.getProperty('VALIDATEURS') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);

@@ -303,19 +303,33 @@ textarea.saisie { resize: vertical; line-height: 1.5; }
 .fenetre-tuto video::cue { font-family: var(--police); font-size: 1.05em; background: rgba(20, 33, 58, .88); color: #fff; }
 .fenetre-note { margin: 0; padding: 12px 20px; font-size: 14px; color: var(--encre-douce); }
 
-/* Écran plein cadre de l'envoi : chargement, puis réponse (réussite ou échec) */
-.ecran-envoi { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(10, 18, 35, .84); overflow-y: auto; }
+/* Page plein écran de l'envoi : chargement, puis réponse (réussite ou échec) */
+.ecran-envoi { position: fixed; inset: 0; z-index: 1000; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center; padding: 56px 20px 40px; box-sizing: border-box; background: var(--surface); color: var(--encre); }
 .ecran-envoi[hidden] { display: none; }
-.ecran-envoi-carte { width: min(680px, 100%); box-sizing: border-box; padding: 44px 32px 36px; background: var(--surface); color: var(--encre); border-top: 10px solid var(--accent); border-radius: 6px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 22px; box-shadow: 0 24px 64px rgba(0, 0, 0, .4); }
-.ecran-envoi h2 { margin: 0; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; }
-.ecran-envoi p { margin: 0; font-size: 21px; line-height: 1.45; max-width: 34em; }
-.ecran-envoi p.ecran-gros { font-size: 24px; font-weight: 600; }
-.ecran-envoi .actions-form { justify-content: center; gap: 14px; margin-top: 10px; }
-.ecran-envoi .bouton { font-size: 20px; min-height: 58px; padding: 0 30px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-.roue { width: 72px; height: 72px; border: 9px solid var(--trait); border-top-color: var(--accent); border-radius: 50%; animation: tourne 0.9s linear infinite; }
-@keyframes tourne { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .roue { animation-duration: 3s; } }
-.pastille { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: 700; line-height: 1; color: #FFFFFF; }
+.ecran-envoi::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: 14px; background: var(--accent); }
+.ecran-succes::before { background: var(--vert, #0F7B6C); }
+.ecran-echec::before { background: var(--rouge, #C1272D); }
+.ecran-envoi-corps { width: min(920px, 100%); margin: auto 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 26px; }
+.ecran-surtitre { margin: 0; font-family: var(--police-mono); font-size: 18px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--discret); }
+.ecran-envoi h1 { margin: 0; font-size: clamp(44px, 9vw, 84px); line-height: 1.02; letter-spacing: -0.01em; }
+.ecran-envoi .ecran-gros { margin: 0; font-size: clamp(26px, 4.2vw, 38px); font-weight: 700; line-height: 1.2; }
+.ecran-envoi .ecran-texte { margin: 0; max-width: 30em; font-size: clamp(22px, 3.2vw, 30px); line-height: 1.4; }
+.barre-envoi { position: relative; width: 100%; height: 30px; border-radius: 15px; background: var(--trait); overflow: hidden; }
+.barre-envoi span { position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; border-radius: 15px; background: var(--accent); animation: avance-envoi 1.3s ease-in-out infinite; }
+@keyframes avance-envoi { to { left: 100%; } }
+.etapes-envoi { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; text-align: left; font-size: clamp(22px, 3.4vw, 32px); font-weight: 600; }
+.etapes-envoi li { display: flex; align-items: center; gap: 20px; }
+.marque-etape { flex: 0 0 auto; box-sizing: border-box; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; border: 4px solid var(--trait-fort); color: var(--discret); }
+.etapes-envoi .fait .marque-etape { background: var(--vert, #0F7B6C); border-color: var(--vert, #0F7B6C); color: #FFFFFF; }
+.etapes-envoi .rate .marque-etape { background: var(--rouge, #C1272D); border-color: var(--rouge, #C1272D); color: #FFFFFF; }
+.etapes-envoi .en-cours .marque-etape { border-color: var(--trait); border-top-color: var(--accent); animation: tourne-envoi .9s linear infinite; }
+.etapes-envoi .a-venir { color: var(--discret); font-weight: 500; }
+@keyframes tourne-envoi { to { transform: rotate(360deg); } }
+.pastille { width: 128px; height: 128px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 80px; font-weight: 700; line-height: 1; color: #FFFFFF; }
 .pastille-ok { background: var(--vert, #0F7B6C); }
 .pastille-ko { background: var(--rouge, #C1272D); }
-@media (max-width: 520px) { .ecran-envoi-carte { padding: 32px 20px 28px; } .ecran-envoi .actions-form { flex-direction: column; align-items: stretch; width: 100%; } }
+.actions-ecran { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 6px; }
+.bouton.bouton-geant { min-height: 80px; padding: 0 44px; font-size: clamp(22px, 3vw, 30px); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.bouton.lien-geant { font-size: clamp(20px, 2.8vw, 26px); }
+@media (prefers-reduced-motion: reduce) { .barre-envoi span, .etapes-envoi .en-cours .marque-etape { animation-duration: 3s; } }
+@media (max-width: 560px) { .pastille { width: 120px; height: 120px; font-size: 74px; } .actions-ecran { flex-direction: column; align-items: stretch; width: 100%; } .marque-etape { width: 44px; height: 44px; font-size: 24px; } }

@@ -312,63 +312,96 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
-  // ---- écran plein cadre : chargement, puis réponse claire ---------------------
+  // ---- page plein écran : chargement, puis réponse claire -----------------------
   var ecran = el('div', { id: 'ecran-envoi', classe: 'ecran-envoi', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'ecran-titre', hidden: 'hidden' });
   document.body.appendChild(ecran);
+  var ETAPES_ENVOI = ['Proposition vérifiée', 'Envoi à l\'équipe de relecture', 'Réception confirmée'];
 
-  function montrerEcran(contenu) {
+  function montrerEcran(etat, contenu) {
+    ecran.className = 'ecran-envoi ecran-' + etat;
     ecran.textContent = '';
-    ecran.appendChild(el('div', { classe: 'ecran-envoi-carte' }, contenu));
+    ecran.appendChild(el('div', { classe: 'ecran-envoi-corps' }, contenu));
     ecran.hidden = false;
+    document.body.style.overflow = 'hidden';
+    ecran.scrollTop = 0;
     var t = trouver('ecran-titre'); if (t) { t.setAttribute('tabindex', '-1'); t.focus(); }
   }
-  function fermerEcran() { ecran.hidden = true; ecran.textContent = ''; }
+  function fermerEcran() { ecran.hidden = true; ecran.textContent = ''; document.body.style.overflow = ''; }
+
+  // n = nombre d'étapes terminées ; l'étape n est « en cours » (sauf en cas d'échec).
+  function etapesEnvoi(n, echec) {
+    var ol = el('ol', { classe: 'etapes-envoi' });
+    ETAPES_ENVOI.forEach(function (texte, i) {
+      var etat = i < n ? 'fait' : (i === n ? (echec ? 'rate' : 'en-cours') : 'a-venir');
+      var signe = { fait: '✓', rate: '✕', 'en-cours': '', 'a-venir': String(i + 1) }[etat];
+      var lu = { fait: ' : fait', rate : ' : échec', 'en-cours': ' : en cours', 'a-venir': ' : à venir' }[etat];
+      ol.appendChild(el('li', { classe: etat }, [
+        el('span', { classe: 'marque-etape', 'aria-hidden': 'true', texte: signe }),
+        el('span', { texte: texte }),
+        el('span', { classe: 'sr-only', texte: lu })
+      ]));
+    });
+    return ol;
+  }
+
+  function surtitre() { return el('p', { classe: 'ecran-surtitre', texte: 'Bibliothèque IA Terre · Proposer un projet' }); }
 
   function ecranChargement() {
-    montrerEcran([
-      el('div', { classe: 'roue', 'aria-hidden': 'true' }),
-      el('h2', { id: 'ecran-titre', texte: 'Envoi en cours…' }),
-      el('p', { texte: 'Ne fermez pas cette page. Cela prend quelques secondes.' })
+    montrerEcran('chargement', [
+      surtitre(),
+      el('h1', { id: 'ecran-titre', texte: 'Envoi en cours…' }),
+      el('div', { classe: 'barre-envoi', role: 'progressbar', 'aria-label': 'Envoi en cours' }, [el('span')]),
+      etapesEnvoi(1),
+      el('p', { classe: 'ecran-texte', texte: 'Ne fermez pas cette page. Cela prend quelques secondes.' })
     ]);
   }
 
   function ecranSucces(titre) {
     try { localStorage.removeItem(CLE_BROUILLON); } catch (e) { /* ignoré */ }
-    var accueil = el('a', { href: '../index.html', classe: 'bouton', texte: 'Retourner à l\'accueil' });
-    var autre = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Proposer un autre projet' });
+    var accueil = el('a', { href: '../index.html', classe: 'bouton bouton-geant', texte: 'Retourner à l\'accueil' });
+    var autre = el('button', { type: 'button', classe: 'bouton secondaire bouton-geant', texte: 'Proposer un autre projet' });
     autre.addEventListener('click', function () { reinitialiser(); fermerEcran(); window.scrollTo(0, 0); });
-    montrerEcran([
+    montrerEcran('succes', [
+      surtitre(),
       el('div', { classe: 'pastille pastille-ok', 'aria-hidden': 'true', texte: '✓' }),
-      el('h2', { id: 'ecran-titre', texte: 'Votre proposition a été envoyée' }),
+      el('h1', { id: 'ecran-titre', texte: 'Proposition envoyée' }),
       el('p', { classe: 'ecran-gros', texte: '« ' + titre + ' » est bien arrivée. Merci !' }),
-      el('p', { texte: 'Une personne de l\'équipe va la relire. Rien n\'est publié avant cette relecture.' }),
-      el('div', { classe: 'actions-form' }, [accueil, autre])
+      el('div', { classe: 'actions-ecran' }, [accueil, autre]),
+      el('p', { classe: 'ecran-texte', texte: 'Une personne de l\'équipe va la relire. Rien n\'est publié avant cette relecture. Vous n\'avez plus rien à faire.' }),
+      etapesEnvoi(3)
     ]);
   }
 
   function ecranEchec(message, relancer, fichier) {
-    var reessayer = el('button', { type: 'button', classe: 'bouton', texte: 'Réessayer' });
+    var reessayer = el('button', { type: 'button', classe: 'bouton bouton-geant', texte: 'Réessayer' });
     reessayer.addEventListener('click', relancer);
-    var tele = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Télécharger le fichier' });
+    var tele = el('button', { type: 'button', classe: 'bouton secondaire bouton-geant', texte: 'Télécharger le fichier' });
     tele.addEventListener('click', fichier);
-    var retour = el('button', { type: 'button', classe: 'bouton lien', texte: 'Revenir à ma proposition' });
+    var retour = el('button', { type: 'button', classe: 'bouton lien lien-geant', texte: 'Revenir à ma proposition' });
     retour.addEventListener('click', fermerEcran);
-    montrerEcran([
+    montrerEcran('echec', [
+      surtitre(),
       el('div', { classe: 'pastille pastille-ko', 'aria-hidden': 'true', texte: '!' }),
-      el('h2', { id: 'ecran-titre', texte: 'L\'envoi n\'a pas abouti' }),
+      el('h1', { id: 'ecran-titre', texte: 'L\'envoi n\'a pas abouti' }),
       el('p', { classe: 'ecran-gros', texte: 'Votre proposition n\'est pas considérée comme envoyée.' }),
-      el('p', { texte: message }),
-      el('div', { classe: 'actions-form' }, [reessayer, tele, retour])
+      el('div', { classe: 'actions-ecran' }, [reessayer, tele]),
+      el('p', { classe: 'ecran-texte', texte: message }),
+      retour,
+      etapesEnvoi(1, true)
     ]);
   }
 
+  var DUREE_MIN_CHARGEMENT = 1500; // ms : la page de chargement reste lisible même si la réponse est immédiate
+
   function envoyer(s, contact, json, nom) {
     ecranChargement();
+    var debut = Date.now();
     var corps = JSON.stringify({ p: s, contact: contact, piege: valeur('site-web') });
     var termine = false;
+    function apres(fn) { setTimeout(fn, Math.max(0, DUREE_MIN_CHARGEMENT - (Date.now() - debut))); }
     function echec(msg) {
       if (termine) { return; } termine = true;
-      ecranEchec(msg, function () { envoyer(s, contact, json, nom); }, function () { telecharger(json, nom); });
+      apres(function () { ecranEchec(msg, function () { envoyer(s, contact, json, nom); }, function () { telecharger(json, nom); }); });
     }
     var minuteurEnvoi = setTimeout(function () {
       echec('La réponse met trop de temps à arriver. Réessayez, ou téléchargez le fichier pour l\'envoyer autrement. ' + D.contact);
@@ -378,7 +411,7 @@
       .then(function (j) {
         clearTimeout(minuteurEnvoi);
         if (termine) { return; }
-        if (j && j.ok) { termine = true; ecranSucces(s.titre); }
+        if (j && j.ok) { termine = true; apres(function () { ecranSucces(s.titre); }); }
         else { echec((j && j.erreur ? j.erreur + ' ' : '') + 'Réessayez dans un moment, ou téléchargez le fichier. ' + D.contact); }
       })
       .catch(function () {
