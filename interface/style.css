@@ -257,7 +257,8 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.005em; line-height: 1.15; text
 .champ-titre, .sous-titre { font-weight: 600; }
 .sous-champ { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600; min-width: 0; }
 .sous-champ .saisie { font-weight: 400; }
-.requis { font-weight: 400; color: var(--discret); font-size: 13px; }
+.requis { font-weight: 700; color: var(--accent-fort); font-size: 13px; }
+.facultatif { font-weight: 400; color: var(--discret); font-size: 13px; }
 .champ-aide { margin: 0; font-size: 14px; color: var(--discret); max-width: 68ch; }
 .saisie { width: 100%; font: inherit; color: var(--encre); background: var(--fond); border: 1px solid var(--trait-fort); border-radius: var(--rayon); padding: 10px 12px; min-height: 44px; box-sizing: border-box; }
 textarea.saisie { resize: vertical; line-height: 1.5; }

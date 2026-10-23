@@ -1,5 +1,6 @@
-/* Formulaire « Proposer un projet » : tout se passe dans le navigateur, rien n'est envoyé.
-   À la fin, le contributeur télécharge un fichier .json qu'il transmet au responsable. */
+/* Formulaire « Proposer un projet ». Tout se prépare dans le navigateur ; rien n'est envoyé
+   tant que le contributeur n'a pas cliqué sur « Envoyer ». Les marquages, grades, adresses,
+   téléphones et clés sont retirés automatiquement (epurer.js) au lieu de bloquer le dépôt. */
 (function () {
   'use strict';
 
@@ -38,7 +39,7 @@
 
   function champ(id, titre, aide, controle, requis) {
     var etiquette = el('label', { 'for': id, classe: 'champ-titre' }, [el('span', { texte: titre })]);
-    if (requis) { etiquette.appendChild(el('span', { classe: 'requis', texte: ' (obligatoire)' })); }
+    etiquette.appendChild(requis ? el('span', { classe: 'requis', texte: ' (obligatoire)' }) : el('span', { classe: 'facultatif', texte: ' (facultatif)' }));
     var enfants = [etiquette];
     if (aide) { enfants.push(el('p', { classe: 'champ-aide', id: id + '-aide', texte: aide })); controle.setAttribute('aria-describedby', id + '-aide'); }
     controle.id = id;
@@ -85,37 +86,44 @@
   var erreursZone = el('div', { id: 'erreurs', classe: 'erreurs-form', role: 'alert', hidden: 'hidden' });
   var resultat = el('div', { id: 'resultat', classe: 'resultat-form', hidden: 'hidden' });
 
+  var piege = el('input', { type: 'text', id: 'site-web', name: 'site-web', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
+  piege.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;opacity:0';
+
   var formulaire = el('form', { novalidate: 'novalidate', classe: 'formulaire' }, [
-    section('1. L\'essentiel', 'Quelques mots pour que les camarades comprennent de quoi il s\'agit.', [
+    section('1. L\'essentiel (obligatoire)', 'Cinq informations suffisent. Tout le reste est facultatif : la personne qui relira votre dépôt le complétera avec l\'aide de l\'IA.', [
       champ('titre', 'Titre', 'Court et parlant. Exemple : Synthèse de conférence.', ligne('titre'), true),
-      champ('resume', 'Résumé', 'Une ou deux phrases : ce que fait le projet et pour qui.', zone(3), true),
+      champ('auteur', 'Pseudo ou prénom', 'Pas de nom complet, pas de grade ni d\'unité (ils seraient retirés).', ligne('auteur'), true),
+      champ('resume', 'Résumé', 'Deux ou trois phrases : ce que fait le projet et pour qui.', zone(3), true),
       el('div', { classe: 'champ' }, [el('span', { classe: 'champ-titre', id: 'type-titre', texte: 'Type de projet' }), typeRadios]),
-      el('div', { classe: 'ligne-deux' }, [
-        champ('usage', 'Usage principal', '', liste(V.usage), true),
-        champ('niveau', 'Niveau demandé à l\'utilisateur', '', liste(V.niveau), true)
-      ]),
-      el('div', { classe: 'champ' }, [el('span', { classe: 'champ-titre', id: 'ia-titre', texte: 'Fonctionne avec' }), el('p', { classe: 'champ-aide', texte: 'Cochez les IA avec lesquelles vous l\'avez testé. « Toutes les IA » si le projet est générique.' }), iaBoites]),
-      el('div', { classe: 'ligne-deux' }, [
-        champ('langue', 'Langue des consignes', '', liste(V.langue), true),
-        champ('etiquettes', 'Mots-clés', 'Jusqu\'à 5, séparés par des virgules. Exemple : conférence, notes, fiche.', ligne('etiquettes'))
-      ]),
-      champ('auteur', 'Auteur', 'Votre prénom ou un pseudo. Pas de nom complet, pas de grade ni d\'unité.', ligne('auteur'), true)
+      el('div', { classe: 'champ' }, [el('span', { classe: 'champ-titre', id: 'ia-titre' }, [el('span', { texte: 'Testé avec' }), el('span', { classe: 'requis', texte: ' (obligatoire)' })]), el('p', { classe: 'champ-aide', texte: 'Cochez les IA avec lesquelles vous l\'avez testé. « Toutes les IA » si le projet est générique.' }), iaBoites])
     ]),
-    section('2. Ce que le projet résout', 'Écrivez comme si vous l\'expliquiez à un camarade qui débute.', [
-      champ('probleme', 'Le problème résolu', 'Quelle situation, qu\'est-ce qui prend du temps ou fait des erreurs aujourd\'hui ?', zone(5), true),
-      champ('donne', 'Ce que l\'utilisateur donne', 'Exemple : ses notes brutes, collées telles quelles.', ligne('donne'), true),
-      champ('recoit', 'Ce que l\'utilisateur reçoit', 'Exemple : une fiche structurée avec les idées clés.', ligne('recoit'), true),
-      champ('limites', 'Limites connues', 'Ce que le projet ne fait pas ou fait mal. Une limite par ligne. C\'est la partie la plus utile pour les autres.', zone(4))
-    ]),
-    section('3. Le contenu', 'C\'est le cœur du projet : ce que les camarades vont copier.', [
+    section('2. Le contenu (obligatoire)', 'C\'est le cœur du projet : ce que les camarades vont copier.', [
       el('div', { classe: 'champ' }, [el('label', { 'for': 'contenu', classe: 'champ-titre' }, [contenuLabel, el('span', { classe: 'requis', texte: ' (obligatoire)' })]), contenuAide, contenuZone])
     ]),
-    section('4. Comment ça marche, étape par étape (facultatif)', 'Vous pouvez laisser cette partie vide : elle pourra être ajoutée plus tard. Si vous la remplissez, comptez au moins 2 étapes (maximum ' + MAX_ETAPES + '). Pour chacune, dites qui agit : l\'utilisateur ou l\'IA. Elles deviennent le schéma interactif de la fiche. Une étape laissée entièrement vide est ignorée.', [etapesZone, boutonAjouter]),
-    section('5. Exemples fictifs (facultatif, mais recommandé)', 'Un exemple d\'entrée et le résultat attendu permettent de tester le projet en deux minutes. Entièrement inventés. Vous pouvez les ajouter plus tard.', [
-      champ('exemple_entree', 'Exemple d\'entrée', '', zone(5, '', true)),
-      champ('exemple_sortie', 'Résultat attendu', '', zone(5, '', true))
+    section('3. Vos engagements (obligatoire)', 'Vous certifiez avoir vérifié ces quatre points. Ils s\'affichent sur la fiche.', [attestations]),
+    section('4. Pour compléter la fiche (facultatif)', 'Vous pouvez tout laisser vide. Ce que vous renseignez ici sera repris tel quel ; le reste sera proposé par la personne qui relit.', [
+      el('div', { classe: 'ligne-deux' }, [
+        champ('usage', 'Usage principal', '', liste(V.usage, '— à compléter par la relecture —')),
+        champ('niveau', 'Niveau demandé à l\'utilisateur', '', liste(V.niveau, '— à compléter par la relecture —'))
+      ]),
+      el('div', { classe: 'ligne-deux' }, [
+        champ('langue', 'Langue des consignes', '', liste(V.langue, '— à compléter par la relecture —')),
+        champ('etiquettes', 'Mots-clés', 'Jusqu\'à 5, séparés par des virgules.', ligne('etiquettes'))
+      ]),
+      champ('probleme', 'Le problème résolu', 'Quelle situation, qu\'est-ce qui prend du temps ou fait des erreurs aujourd\'hui ?', zone(4)),
+      champ('donne', 'Ce que l\'utilisateur donne', 'Exemple : ses notes brutes, collées telles quelles.', ligne('donne')),
+      champ('recoit', 'Ce que l\'utilisateur reçoit', 'Exemple : une fiche structurée avec les idées clés.', ligne('recoit')),
+      champ('limites', 'Limites connues', 'Ce que le projet ne fait pas ou fait mal. Une limite par ligne.', zone(3))
     ]),
-    section('6. Vos engagements', 'Vous certifiez avoir vérifié ces quatre points. Ils s\'affichent sur la fiche.', [attestations]),
+    section('5. Comment ça marche, étape par étape (facultatif)', 'Vous pouvez laisser cette partie vide. Si vous la remplissez, comptez au moins 2 étapes (maximum ' + MAX_ETAPES + '). Pour chacune, dites qui agit : l\'utilisateur ou l\'IA. Une étape laissée entièrement vide est ignorée.', [etapesZone, boutonAjouter]),
+    section('6. Exemples fictifs (facultatif, mais recommandé)', 'Un exemple d\'entrée et le résultat attendu permettent de tester le projet en deux minutes. Entièrement inventés.', [
+      champ('exemple_entree', 'Exemple d\'entrée', '', zone(4, '', true)),
+      champ('exemple_sortie', 'Résultat attendu', '', zone(4, '', true))
+    ]),
+    section('7. Contact (facultatif)', 'Une adresse pour que la personne qui relit puisse vous poser une question. Elle n\'est jamais publiée ni écrite dans la fiche.', [
+      champ('contact', 'Votre adresse de messagerie', '', ligne('contact'))
+    ]),
+    piege,
     erreursZone,
     el('div', { classe: 'actions-form' }, [
       el('button', { type: 'submit', classe: 'bouton', texte: 'Vérifier et préparer ma proposition' }),
@@ -196,7 +204,7 @@
     };
   }
   function appliquer(s) {
-    ['titre', 'resume', 'usage', 'niveau', 'langue', 'etiquettes', 'auteur', 'probleme', 'donne', 'recoit', 'limites', 'exemple_entree', 'exemple_sortie'].forEach(function (id) {
+    ['titre', 'resume', 'usage', 'niveau', 'langue', 'etiquettes', 'auteur', 'probleme', 'donne', 'recoit', 'limites', 'exemple_entree', 'exemple_sortie', 'contact'].forEach(function (id) {
       if (typeof s[id] === 'string' && trouver(id)) { trouver(id).value = s[id]; }
     });
     var r = formulaire.querySelector('input[name=type][value="' + s.type + '"]'); if (r) { r.checked = true; }
@@ -231,50 +239,12 @@
   }
 
   // ---- contrôles -----------------------------------------------------------
-  var MARQUAGES = /(^|[^A-Za-zÀ-ÿ])(DIFFUSION\s+RESTREINTE|CONFIDENTIEL(?:\s+D[ÉE]FENSE)?|SECRET(?:\s+D[ÉE]FENSE)?|TR[ÈE]S\s+SECRET|NON\s+PROT[ÉE]G[ÉE]|RESTRICTED|NATO\s+(?:SECRET|CONFIDENTIAL|RESTRICTED))(?![A-Za-zÀ-ÿ])/;
-  var COURRIEL = /[\w.+-]+@([\w-]+(?:\.[\w-]+)+)/g;
-  var TELEPHONE = /(?:^|[^\d.])((?:\+33|0033|0)[1-9](?:[ .-]?\d{2}){4})(?!\d)/;
-  var IP = /(?:^|[^\d])((?:\d{1,3}\.){3}\d{1,3})(?!\d)(?!\.\d)/;
-  var SECRETS = /\b(sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{10,})\b|(api[_-]?key|jeton|token|mot[_ ]de[_ ]passe|password)\s*[:=]\s*["']?[A-Za-z0-9_\-]{12,}/i;
-  var CODE_RESEAU = /^\s*(?:import|from)\s+(socket|urllib|requests|http|httpx|ftplib|smtplib|telnetlib|paramiko|aiohttp|websockets?|ssl|xmlrpc)\b/m;
-  var CODE_DANGER = /\b(os\.system|subprocess|eval\s*\(|exec\s*\(|__import__|pickle|ctypes)\b/;
-
-  function textes(s) {
-    var t = [['Titre', s.titre], ['Résumé', s.resume], ['Mots-clés', s.etiquettes], ['Auteur', s.auteur], ['Problème résolu', s.probleme],
-      ['Ce que l\'utilisateur donne', s.donne], ['Ce que l\'utilisateur reçoit', s.recoit], ['Limites', s.limites], ['Contenu', s.contenu],
-      ['Exemple d\'entrée', s.exemple_entree], ['Résultat attendu', s.exemple_sortie]];
-    s.etapes.forEach(function (e, i) {
-      ['titre', 'entree', 'sortie', 'texte', 'exemple'].forEach(function (c) { t.push(['Étape ' + (i + 1) + ' (' + c + ')', e[c]]); });
-    });
-    return t;
-  }
-  function verifierSensibles(s) {
-    var problemes = [];
-    textes(s).forEach(function (p) {
-      var nom = p[0], texte = p[1] || '';
-      var m;
-      if ((m = MARQUAGES.exec(texte))) { problemes.push(nom + ' : mention de protection « ' + m[2] + ' ». Aucun contenu protégé n\'a sa place ici.'); }
-      var c; COURRIEL.lastIndex = 0;
-      while ((c = COURRIEL.exec(texte))) {
-        var dom = c[1].toLowerCase();
-        if (!(/(^|\.)(example\.(com|org|net)|invalid|test|example)$/.test(dom))) { problemes.push(nom + ' : adresse électronique « ' + c[0] + ' ». Utilisez nom@example.org.'); }
-      }
-      if ((m = TELEPHONE.exec(texte))) { problemes.push(nom + ' : numéro de téléphone « ' + m[1] + ' ».'); }
-      if ((m = IP.exec(texte)) && m[1].split('.').every(function (o) { return +o <= 255; })) { problemes.push(nom + ' : adresse IP « ' + m[1] + ' ».'); }
-      if (SECRETS.test(texte)) { problemes.push(nom + ' : clé, jeton ou mot de passe apparent.'); }
-    });
-    if (s.type === 'script') {
-      if (CODE_RESEAU.test(s.contenu)) { problemes.push('Contenu : le code contacte (ou peut contacter) un service extérieur. Ce n\'est pas autorisé.'); }
-      if (CODE_DANGER.test(s.contenu)) { problemes.push('Contenu : instruction non autorisée dans un script partagé (commande système, évaluation de texte…).'); }
-    }
-    return problemes;
-  }
   function etapeRemplie(e) {
     return !!(e.titre || e.entree || e.sortie || e.texte || e.exemple);
   }
   function verifierChamps(s) {
     var p = [];
-    [['titre', 'Le titre'], ['resume', 'Le résumé'], ['auteur', 'L\'auteur'], ['probleme', 'Le problème résolu'], ['donne', 'Ce que l\'utilisateur donne'], ['recoit', 'Ce que l\'utilisateur reçoit']].forEach(function (c) {
+    [['titre', 'Le titre'], ['auteur', 'Le pseudo ou prénom'], ['resume', 'Le résumé']].forEach(function (c) {
       if (!s[c[0]]) { p.push({ id: c[0], texte: c[1] + ' est à remplir.' }); }
     });
     if (!s.ia_compatibles.length) { p.push({ id: 'ia-titre', texte: 'Cochez au moins une IA.' }); }
@@ -327,29 +297,72 @@
     document.body.removeChild(t);
   }
 
-  function montrerResultat(s) {
+  var LIBELLES_RETRAITS = { marquage: 'mention de protection', grade: 'grade (avec le nom qui suit)', courriel: 'adresse de messagerie', telephone: 'numéro de téléphone', cle: 'clé ou mot de passe', ip: 'adresse IP' };
+
+  function phraseRetraits(retraits) {
+    var l = Object.keys(LIBELLES_RETRAITS).filter(function (k) { return retraits[k]; }).map(function (k) { return retraits[k] + ' × ' + LIBELLES_RETRAITS[k]; });
+    return l.length ? l : null;
+  }
+
+  function telecharger(json, nom) {
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = el('a', { href: url, download: nom });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  function envoyer(s, contact, statut, bouton) {
+    bouton.disabled = true;
+    statut.textContent = 'Envoi en cours…';
+    var corps = JSON.stringify({ p: s, contact: contact, piege: valeur('site-web') });
+    fetch(D.boite, { method: 'POST', body: corps })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) {
+          statut.textContent = 'Votre proposition a bien été reçue. Elle sera relue avant toute publication. Merci !';
+          try { localStorage.removeItem(CLE_BROUILLON); } catch (e) { /* ignoré */ }
+        } else {
+          bouton.disabled = false;
+          statut.textContent = (j && j.erreur ? j.erreur + ' ' : '') + 'Téléchargez le fichier et envoyez-le comme indiqué ci-dessous.';
+        }
+      })
+      .catch(function () {
+        bouton.disabled = false;
+        statut.textContent = 'La réception n\'a pas pu être confirmée (réseau ou filtrage). Ne la considérez pas comme envoyée : téléchargez le fichier et envoyez-le comme indiqué ci-dessous.';
+      });
+  }
+
+  function montrerResultat(s, retraits, alertes, contact) {
     var json = JSON.stringify(s, null, 2);
     var nom = nomFichier(s);
-    var telecharger = el('button', { type: 'button', classe: 'bouton', texte: 'Télécharger le fichier ' + nom });
-    telecharger.addEventListener('click', function () {
-      var blob = new Blob([json], { type: 'application/json' });
-      var url = URL.createObjectURL(blob);
-      var a = el('a', { href: url, download: nom });
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-    });
-    var copie = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Copier le contenu' });
-    copie.addEventListener('click', function () { copier(json, copie); });
     resultat.textContent = '';
     resultat.appendChild(el('h2', { texte: 'Votre proposition est prête' }));
-    resultat.appendChild(el('p', { texte: 'Les contrôles automatiques sont passés. Rien n\'a été envoyé : tout est resté dans votre navigateur.' }));
-    resultat.appendChild(el('ol', {}, [
-      el('li', { texte: 'Téléchargez le fichier ci-dessous.' }),
-      el('li', { texte: D.contact }),
-      el('li', { texte: 'Il sera relu, puis publié sur le site avec le statut « proposé ».' })
-    ]));
-    resultat.appendChild(el('div', { classe: 'actions-form' }, [telecharger, copie]));
+    resultat.appendChild(el('p', { texte: 'Rien n\'a encore été envoyé. Voici exactement ce qui partira si vous cliquez sur « Envoyer » :' }));
     resultat.appendChild(el('details', { classe: 'details-json' }, [el('summary', { texte: 'Voir le contenu du fichier' }), el('pre', { classe: 'bloc-code', texte: json })]));
+
+    var r = phraseRetraits(retraits);
+    if (r) {
+      var ul = el('ul'); r.forEach(function (t) { ul.appendChild(el('li', { texte: t })); });
+      resultat.appendChild(el('div', { classe: 'avis-regle' }, [el('p', { texte: 'Pour que le dépôt reste utilisable par tous, ces éléments ont été retirés automatiquement du fichier (votre brouillon, lui, n\'a pas été modifié) :' }), ul]));
+    }
+    alertes.forEach(function (t) { resultat.appendChild(el('p', { classe: 'avis-regle', texte: 'À savoir : ' + t })); });
+
+    var statut = el('p', { classe: 'champ-aide', role: 'status' });
+    var actions = el('div', { classe: 'actions-form' });
+    if (D.boite) {
+      var envoi = el('button', { type: 'button', classe: 'bouton', texte: 'Envoyer ma proposition' });
+      envoi.addEventListener('click', function () { envoyer(s, contact, statut, envoi); });
+      actions.appendChild(envoi);
+    }
+    var tele = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Télécharger le fichier ' + nom });
+    tele.addEventListener('click', function () { telecharger(json, nom); });
+    var copie = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Copier le contenu' });
+    copie.addEventListener('click', function () { copier(json, copie); });
+    actions.appendChild(tele); actions.appendChild(copie);
+    resultat.appendChild(actions);
+    resultat.appendChild(statut);
+    resultat.appendChild(el('p', { classe: 'champ-aide', texte: D.boite ? 'Si l\'envoi échoue : ' + D.contact : D.contact }));
     resultat.hidden = false;
     erreursZone.hidden = true;
     resultat.scrollIntoView({ block: 'start' });
@@ -357,12 +370,14 @@
 
   formulaire.addEventListener('submit', function (ev) {
     ev.preventDefault();
-    var s = etat();
-    s.etapes = s.etapes.map(function (e, i) { e.n = i + 1; return e; }).filter(etapeRemplie);
-    var problemes = verifierChamps(s).concat(verifierSensibles(s).map(function (t) { return { id: null, texte: t }; }));
+    var brut = etat();
+    brut.etapes = brut.etapes.map(function (e, i) { e.n = i + 1; return e; }).filter(etapeRemplie);
+    var problemes = verifierChamps(brut);
     if (problemes.length) { montrerErreurs(problemes); return; }
-    s.etapes.forEach(function (e) { delete e.n; });
-    montrerResultat(s);
+    brut.etapes.forEach(function (e) { delete e.n; });
+    var contact = valeur('contact');
+    var ep = Epurer.proposition(brut);
+    montrerResultat(ep.proposition, ep.retraits, ep.alertes, contact);
   });
 
   formulaire.addEventListener('input', sauver);

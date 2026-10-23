@@ -352,8 +352,9 @@ class Constructeur:
         )
         contenu = (
             '<article class="doc doc-page page-formulaire"><h1>Proposer un projet</h1><p class="chapeau">%s</p>'
-            '<p class="avis-regle"><strong>Avant de commencer :</strong> aucune donnée réelle, aucun nom, aucune adresse, '
-            'aucune mention de protection. Les <a href="regles.html">règles de publication</a> expliquent pourquoi.</p>'
+            '<p class="avis-regle"><strong>Avant de commencer :</strong> aucune donnée réelle, aucun nom, aucune adresse. '
+            'Si une mention de protection, un grade, une adresse de messagerie, un numéro de téléphone ou une clé se glisse dans votre texte, '
+            'il sera retiré automatiquement avant l\'envoi : votre dépôt ne sera pas refusé. Les <a href="regles.html">règles de publication</a> expliquent pourquoi.</p>'
             '<noscript><p class="avis-js">Ce formulaire demande JavaScript.</p></noscript>'
             '<div id="formulaire"></div></article>'
         ) % echapper(intro)
@@ -363,9 +364,11 @@ class Constructeur:
                           controles={k: self.vocab["controles"][k] for k in
                                      ("aucune-donnee-reelle", "exemples-fictifs", "aucun-nom-adresse", "aucun-appel-reseau")}),
             "contact": self.site.get("contact_propositions", "Envoyez ce fichier à la personne qui gère la bibliothèque."),
+            # Adresse de la boîte de dépôt (script Google). Vide : le formulaire propose seulement le téléchargement.
+            "boite": self.site.get("boite_depot", ""),
         }
         self.page(SITE / "pages" / "proposer.html", "Proposer un projet — %s" % self.site["nom"], contenu, "../", "proposer",
-                  donnees=donnees, scripts=("proposer.js",), classe="page-doc")
+                  donnees=donnees, scripts=("epurer.js", "proposer.js"), classe="page-doc")
 
     def lancer(self):
         projets = self.lire_tous()
@@ -373,7 +376,7 @@ class Constructeur:
             shutil.rmtree(str(SITE))
         SITE.mkdir(parents=True)
         (SITE / "assets").mkdir()
-        for nom in ("style.css", "catalogue.js", "projet.js", "proposer.js"):
+        for nom in ("style.css", "catalogue.js", "projet.js", "proposer.js", "epurer.js"):
             shutil.copy(str(INTERFACE / nom), str(SITE / "assets" / nom))
         for dossier in ("polices", "video"):
             if (INTERFACE / dossier).is_dir():
