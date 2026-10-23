@@ -302,3 +302,20 @@ textarea.saisie { resize: vertical; line-height: 1.5; }
 .fenetre-tuto video { display: block; width: 100%; height: auto; background: #000; aspect-ratio: 16 / 9; }
 .fenetre-tuto video::cue { font-family: var(--police); font-size: 1.05em; background: rgba(20, 33, 58, .88); color: #fff; }
 .fenetre-note { margin: 0; padding: 12px 20px; font-size: 14px; color: var(--encre-douce); }
+
+/* Écran plein cadre de l'envoi : chargement, puis réponse (réussite ou échec) */
+.ecran-envoi { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(10, 18, 35, .84); overflow-y: auto; }
+.ecran-envoi[hidden] { display: none; }
+.ecran-envoi-carte { width: min(680px, 100%); box-sizing: border-box; padding: 44px 32px 36px; background: var(--surface); color: var(--encre); border-top: 10px solid var(--accent); border-radius: 6px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 22px; box-shadow: 0 24px 64px rgba(0, 0, 0, .4); }
+.ecran-envoi h2 { margin: 0; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; }
+.ecran-envoi p { margin: 0; font-size: 21px; line-height: 1.45; max-width: 34em; }
+.ecran-envoi p.ecran-gros { font-size: 24px; font-weight: 600; }
+.ecran-envoi .actions-form { justify-content: center; gap: 14px; margin-top: 10px; }
+.ecran-envoi .bouton { font-size: 20px; min-height: 58px; padding: 0 30px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.roue { width: 72px; height: 72px; border: 9px solid var(--trait); border-top-color: var(--accent); border-radius: 50%; animation: tourne 0.9s linear infinite; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .roue { animation-duration: 3s; } }
+.pastille { width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: 700; line-height: 1; color: #FFFFFF; }
+.pastille-ok { background: var(--vert, #0F7B6C); }
+.pastille-ko { background: var(--rouge, #C1272D); }
+@media (max-width: 520px) { .ecran-envoi-carte { padding: 32px 20px 28px; } .ecran-envoi .actions-form { flex-direction: column; align-items: stretch; width: 100%; } }

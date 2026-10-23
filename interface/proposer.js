@@ -312,25 +312,89 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
-  function envoyer(s, contact, statut, bouton) {
-    bouton.disabled = true;
-    statut.textContent = 'Envoi en cours…';
+  // ---- écran plein cadre : chargement, puis réponse claire ---------------------
+  var ecran = el('div', { id: 'ecran-envoi', classe: 'ecran-envoi', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'ecran-titre', hidden: 'hidden' });
+  document.body.appendChild(ecran);
+
+  function montrerEcran(contenu) {
+    ecran.textContent = '';
+    ecran.appendChild(el('div', { classe: 'ecran-envoi-carte' }, contenu));
+    ecran.hidden = false;
+    var t = trouver('ecran-titre'); if (t) { t.setAttribute('tabindex', '-1'); t.focus(); }
+  }
+  function fermerEcran() { ecran.hidden = true; ecran.textContent = ''; }
+
+  function ecranChargement() {
+    montrerEcran([
+      el('div', { classe: 'roue', 'aria-hidden': 'true' }),
+      el('h2', { id: 'ecran-titre', texte: 'Envoi en cours…' }),
+      el('p', { texte: 'Ne fermez pas cette page. Cela prend quelques secondes.' })
+    ]);
+  }
+
+  function ecranSucces(titre) {
+    try { localStorage.removeItem(CLE_BROUILLON); } catch (e) { /* ignoré */ }
+    var accueil = el('a', { href: '../index.html', classe: 'bouton', texte: 'Retourner à l\'accueil' });
+    var autre = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Proposer un autre projet' });
+    autre.addEventListener('click', function () { reinitialiser(); fermerEcran(); window.scrollTo(0, 0); });
+    montrerEcran([
+      el('div', { classe: 'pastille pastille-ok', 'aria-hidden': 'true', texte: '✓' }),
+      el('h2', { id: 'ecran-titre', texte: 'Votre proposition a été envoyée' }),
+      el('p', { classe: 'ecran-gros', texte: '« ' + titre + ' » est bien arrivée. Merci !' }),
+      el('p', { texte: 'Une personne de l\'équipe va la relire. Rien n\'est publié avant cette relecture.' }),
+      el('div', { classe: 'actions-form' }, [accueil, autre])
+    ]);
+  }
+
+  function ecranEchec(message, relancer, fichier) {
+    var reessayer = el('button', { type: 'button', classe: 'bouton', texte: 'Réessayer' });
+    reessayer.addEventListener('click', relancer);
+    var tele = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Télécharger le fichier' });
+    tele.addEventListener('click', fichier);
+    var retour = el('button', { type: 'button', classe: 'bouton lien', texte: 'Revenir à ma proposition' });
+    retour.addEventListener('click', fermerEcran);
+    montrerEcran([
+      el('div', { classe: 'pastille pastille-ko', 'aria-hidden': 'true', texte: '!' }),
+      el('h2', { id: 'ecran-titre', texte: 'L\'envoi n\'a pas abouti' }),
+      el('p', { classe: 'ecran-gros', texte: 'Votre proposition n\'est pas considérée comme envoyée.' }),
+      el('p', { texte: message }),
+      el('div', { classe: 'actions-form' }, [reessayer, tele, retour])
+    ]);
+  }
+
+  function envoyer(s, contact, json, nom) {
+    ecranChargement();
     var corps = JSON.stringify({ p: s, contact: contact, piege: valeur('site-web') });
+    var termine = false;
+    function echec(msg) {
+      if (termine) { return; } termine = true;
+      ecranEchec(msg, function () { envoyer(s, contact, json, nom); }, function () { telecharger(json, nom); });
+    }
+    var minuteurEnvoi = setTimeout(function () {
+      echec('La réponse met trop de temps à arriver. Réessayez, ou téléchargez le fichier pour l\'envoyer autrement. ' + D.contact);
+    }, 45000);
     fetch(D.boite, { method: 'POST', body: corps })
       .then(function (r) { return r.json(); })
       .then(function (j) {
-        if (j && j.ok) {
-          statut.textContent = 'Votre proposition a bien été reçue. Elle sera relue avant toute publication. Merci !';
-          try { localStorage.removeItem(CLE_BROUILLON); } catch (e) { /* ignoré */ }
-        } else {
-          bouton.disabled = false;
-          statut.textContent = (j && j.erreur ? j.erreur + ' ' : '') + 'Téléchargez le fichier et envoyez-le comme indiqué ci-dessous.';
-        }
+        clearTimeout(minuteurEnvoi);
+        if (termine) { return; }
+        if (j && j.ok) { termine = true; ecranSucces(s.titre); }
+        else { echec((j && j.erreur ? j.erreur + ' ' : '') + 'Réessayez dans un moment, ou téléchargez le fichier. ' + D.contact); }
       })
       .catch(function () {
-        bouton.disabled = false;
-        statut.textContent = 'La réception n\'a pas pu être confirmée (réseau ou filtrage). Ne la considérez pas comme envoyée : téléchargez le fichier et envoyez-le comme indiqué ci-dessous.';
+        clearTimeout(minuteurEnvoi);
+        echec('La réception n\'a pas pu être confirmée (réseau ou filtrage). Réessayez, ou téléchargez le fichier pour l\'envoyer autrement. ' + D.contact);
       });
+  }
+
+  function reinitialiser() {
+    try { localStorage.removeItem(CLE_BROUILLON); } catch (e) { /* ignoré */ }
+    formulaire.reset();
+    contenuZone.value = '';
+    etapesZone.textContent = '';
+    ajouterEtape(); ajouterEtape();
+    majContenu();
+    erreursZone.hidden = true; resultat.hidden = true;
   }
 
   function montrerResultat(s, retraits, alertes, contact) {
@@ -348,11 +412,10 @@
     }
     alertes.forEach(function (t) { resultat.appendChild(el('p', { classe: 'avis-regle', texte: 'À savoir : ' + t })); });
 
-    var statut = el('p', { classe: 'champ-aide', role: 'status' });
     var actions = el('div', { classe: 'actions-form' });
     if (D.boite) {
       var envoi = el('button', { type: 'button', classe: 'bouton', texte: 'Envoyer ma proposition' });
-      envoi.addEventListener('click', function () { envoyer(s, contact, statut, envoi); });
+      envoi.addEventListener('click', function () { envoyer(s, contact, json, nom); });
       actions.appendChild(envoi);
     }
     var tele = el('button', { type: 'button', classe: 'bouton secondaire', texte: 'Télécharger le fichier ' + nom });
@@ -361,7 +424,6 @@
     copie.addEventListener('click', function () { copier(json, copie); });
     actions.appendChild(tele); actions.appendChild(copie);
     resultat.appendChild(actions);
-    resultat.appendChild(statut);
     resultat.appendChild(el('p', { classe: 'champ-aide', texte: D.boite ? 'Si l\'envoi échoue : ' + D.contact : D.contact }));
     resultat.hidden = false;
     erreursZone.hidden = true;
@@ -387,13 +449,7 @@
   });
   trouver('effacer').addEventListener('click', function () {
     if (!window.confirm('Effacer tout ce que vous avez saisi ?')) { return; }
-    try { localStorage.removeItem(CLE_BROUILLON); } catch (e) { /* ignoré */ }
-    formulaire.reset();
-    contenuZone.value = '';
-    etapesZone.textContent = '';
-    ajouterEtape(); ajouterEtape();
-    majContenu();
-    erreursZone.hidden = true; resultat.hidden = true;
+    reinitialiser();
   });
 
   // ---- démarrage -------------------------------------------------------
